@@ -1,18 +1,14 @@
 #!/bin/bash
 
 workspace(){
-	SPACE_NUM=$(bspc query -D -d);
+	SPACE_NUM=$(xdotool get_desktop);
 		case "$SPACE_NUM" in
+			"0")
+				WORKSPACE="%{B#FF3399FF}#%{B#FFEEEEEE} # #";;
 			"1")
-				WORKSPACE="%{B#FF3399FF}#%{B#FFEEEEEE} # # # #";;
+				WORKSPACE="# %{B#FF3399FF}#%{B#FFEEEEEE} #";;
 			"2")
-				WORKSPACE="# %{B#FF3399FF}#%{B#FFEEEEEE} # # #";;
-			"3")
-				WORKSPACE="# # %{B#FF3399FF}#%{B#FFEEEEEE} # #";;
-			"4")
-				WORKSPACE="# # # %{B#FF3399FF}#%{B#FFEEEEEE} #";;
-			"5")
-				WORKSPACE="# # # # %{B#FF3399FF}#%{B#FFEEEEEE}";;
+				WORKSPACE="# # %{B#FF3399FF}#%{B#FFEEEEEE}";;
 		esac
 	echo $WORKSPACE
 }
@@ -26,7 +22,7 @@ clock(){
 
 music(){
 	echo -n " "
-	echo -n $(ncmpcpp --now-playing)
+	echo -n $(ncmpcpp --current-song)
 }
 
 gradd(){
@@ -46,6 +42,6 @@ gradu(){
 }
 
 while :; do
-	echo "%{B#FF3399FF}%{l}$(music)$(gradd) %{c}$(workspace) %{r}$(gradu)$(clock)%{B#FFEEEEEE}"
+	echo "%{S1}%{B#FF3399FF}%{l}$(gradd)$(music)%{c}$(workspace)%{r}$(gradu)$(clock)%{B#FFEEEEEE}"
 	sleep 0
 done
