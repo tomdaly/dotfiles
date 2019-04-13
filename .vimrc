@@ -35,11 +35,20 @@ set rtp+=$HOME/.vim/bundle/Vundle.vim
 call vundle#begin('$HOME/.vim/bundle/')
 "" install plugins here
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'w0rp/ale'
+Plugin 'christoomey/vim-tmux-navigator'
 call vundle#end()
 filetype plugin indent on
 
+let g:ale_completion_enabled = 1
+let g:ale_linters = {
+\  'javascript': ['eslint'],
+\}
+
 "" follow the leader
-let mapleader = "\\"
+let mapleader = "\<Space>"
+let maplocalleader = "\\"
 
 "" begin custom
 set encoding=utf-8
@@ -71,6 +80,7 @@ set novisualbell
 set noerrorbells
 set tabstop=4
 set shiftwidth=4
+set softtabstop=4
 set expandtab
 set smarttab
 set modelines=0
@@ -79,12 +89,14 @@ set splitbelow
 set splitright
 set completeopt=longest,menuone
 set so=4
+set backspace=indent,eol,start
 
 "" file explorer
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_winsize = 25
+let g:netrw_winsize = 15
 let g:netrw_altv = 1
+let g:netrw_browse_split = 4
 
 "" syntax
 colorscheme desert
@@ -98,21 +110,23 @@ inoremap {<CR> {<CR>}<Esc>O
 " jk/kj as esc
 inoremap jk <esc>
 inoremap kj <esc>
-" change splits easier
+" split navigation
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 " fast saving
 nmap <leader>w :w!<CR>
-inoremap <expr> <C-n> pumvisible() ? '<C-n>' : \ '<C-n><C-r>=pumvisible() ? "\<lt>Down> : ""<CR'
 " tabs
 map <leader>tn :tabnew<CR>
 map <leader>tc :tabclose<CR>
 map <leader>to :tabonly<CR>
 map <leader>tm :tabmove<CR>
+" buffer switching
+nnoremap gb :ls<CR>:b<Space>
 " spellcheck
 map <leader>s :setlocal spell!<CR>
+
 
 "" statusline
 set laststatus=2
@@ -124,15 +138,18 @@ set statusline+=%1*\ <<
 set statusline+=%1*\ %f " file              
 set statusline+=%1*\ >>
 set statusline+=%=                " right
+set statusline+=%#warningmsg#
+set statusline+=%*
 set statusline+=%3*\%h%m%r  " flags
+set statusline+=%4*\%{b:gitbranch}
 set statusline+=%3*\%.25F
 set statusline+=%3*\::
 set statusline+=%3*\%l/%L\\| " lines
-set statusline+=%3*\%y  " type
+set statusline+=%3*\%y" type
 hi User1 ctermbg=black ctermfg=grey guibg=black guifg=grey
 hi User2 ctermbg=green ctermfg=black guibg=green guifg=black
 hi User3 ctermbg=black ctermfg=lightgreen guibg=black guifg=lightgreen
-hi User4 ctermbg=red ctermfg=black guibg=grey guifg=black
+hi User4 ctermbg=black ctermfg=lightcyan guibg=black guifg=lightcyan
 
 "" statusline functions
 function! StatuslineMode()
@@ -148,6 +165,23 @@ function! StatuslineMode()
     endif
 endfunction
 
+function! StatuslineGitBranch()
+  let b:gitbranch=""
+  if &modifiable
+    lcd %:p:h
+    let l:gitrevparse=system("git rev-parse --abbrev-ref HEAD")
+    lcd -
+    if l:gitrevparse!~"fatal: not a git repository"
+      let b:gitbranch="(".substitute(l:gitrevparse, '\n', '', 'g').") "
+    endif
+  endif
+endfunction
+
+augroup GetGitBranch
+  autocmd!
+  autocmd VimEnter,WinEnter,BufEnter * call StatuslineGitBranch()
+augroup END
+
 augroup CursorLineOnlyInActiveWindow
   autocmd!
   autocmd VimEnter,WinEnter,BufWinEnter * setlocal cursorline
@@ -159,3 +193,6 @@ augroup HybridNumberOnlyInActiveWindow
   autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
   autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
 augroup END
+
+autocmd BufRead,BufNewFile *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
+autocmd BufRead,BufNewFile *.tex,*.bib setlocal nocursorline
