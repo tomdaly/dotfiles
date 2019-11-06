@@ -1,34 +1,4 @@
-"" CMDER SETTINGS, do not edit
 set nocompatible
-filetype off
-source $VIMRUNTIME/vimrc_example.vim
-source $VIMRUNTIME/mswin.vim
-behave mswin
-
-set diffexpr=MyDiff()
-function! MyDiff()
-  let opt = '-a --binary '
-  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-  let arg1 = v:fname_in
-  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-  let arg2 = v:fname_new
-  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-  let arg3 = v:fname_out
-  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-  let eq = ''
-  if $VIMRUNTIME =~ ' '
-    if &sh =~ '\<cmd'
-      let cmd = '""' . $VIMRUNTIME . '\diff"'
-      let eq = '"'
-    else
-      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-    endif
-  else
-    let cmd = $VIMRUNTIME . '\diff'
-  endif
-  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-endfunction
 
 "" Vundle
 set rtp+=$HOME/.vim/bundle/Vundle.vim
@@ -38,9 +8,38 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'w0rp/ale'
 Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'VimWiki/vimwiki'
 call vundle#end()
 filetype plugin indent on
 
+"" vimwiki 
+let wiki_1 = {}
+let wiki_1.path = '~/drive/wiki/wiki.work'
+let wiki_1.path_html = '~/drive/wiki/wiki.work_html'
+let wiki_1.template_path = '~/drive/wiki/wiki.work/templates'
+let wiki_1.template_default = 'default'
+let wiki_1.template_ext = '.html'
+let wiki_1.syntax = 'markdown'
+let wiki_1.ext = '.md'
+let wiki_1.custom_wiki2html = 'vimwiki_markdown'
+let wiki_1.html_filename_parameterization = 1
+
+let wiki_2 = {}
+let wiki_2.path = '~/drive/wiki/wiki.home'
+let wiki_2.path_html = '~/drive/wiki/wiki.home_html'
+let wiki_2.template_path = '~/drive/wiki/wiki.home/templates'
+let wiki_2.template_default = 'default'
+let wiki_2.template_ext = '.html'
+let wiki_2.syntax = 'markdown'
+let wiki_2.ext = '.md'
+let wiki_2.custom_wiki2html = 'vimwiki_markdown'
+let wiki_2.html_filename_parameterization = 1
+
+let g:vimwiki_list = [wiki_1, wiki_2]
+let g:vimwiki_list_ignore_newline = 0
+let g:vimwiki_text_ignore_newline = 0
+
+"" ale
 let g:ale_completion_enabled = 1
 let g:ale_linters = {
 \  'javascript': ['eslint'],
@@ -97,6 +96,9 @@ let g:netrw_banner = 0
 let g:netrw_winsize = 15
 let g:netrw_altv = 1
 let g:netrw_browse_split = 4
+
+"" find files recursively using :find
+set path=.,/usr/include,,**
 
 "" syntax
 colorscheme desert
@@ -196,3 +198,23 @@ augroup END
 
 autocmd BufRead,BufNewFile *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
 autocmd BufRead,BufNewFile *.tex,*.bib setlocal nocursorline
+
+" automatically update links on read diary
+command! Diary VimwikiDiaryIndex
+augroup vimwikigroup
+    autocmd!
+    autocmd BufRead,BufNewFile diary.wiki VimwikiDiaryGenerateLinks
+augroup end
+
+" auto mkdir if saving to dir that doesnt exist
+" useful for vimwiki subfolders
+fun! <SID>AutoMakeDirectory()
+    let s:directory = expand("<afile>:p:h")
+    if !isdirectory(s:directory)
+        call mkdir(s:directory, "p")
+    endif
+endfun
+autocmd BufWritePre,FileWritePre * :call <SID>AutoMakeDirectory()
+
+" wrap git commit lines to 72 chars
+au FileType gitcommit setlocal tw=72
