@@ -9,6 +9,8 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'w0rp/ale'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'VimWiki/vimwiki'
+Bundle 'edkolev/tmuxline.vim'
+Plugin 'junegunn/goyo.vim'
 call vundle#end()
 filetype plugin indent on
 
@@ -36,14 +38,19 @@ let wiki_2.custom_wiki2html = 'vimwiki_markdown'
 let wiki_2.html_filename_parameterization = 1
 
 let g:vimwiki_list = [wiki_1, wiki_2]
+let g:vimwiki_ext2syntax = {'.md' : 'markdown'}
 let g:vimwiki_list_ignore_newline = 0
 let g:vimwiki_text_ignore_newline = 0
+let g:vimwiki_global_ext = 0  " ignore .md files outside wiki dir
 
 "" ale
 let g:ale_completion_enabled = 1
 let g:ale_linters = {
-\  'javascript': ['eslint'],
-\}
+      \  'javascript': ['eslint'],
+      \}
+
+"" goyo
+let g:goyo_width = 220
 
 "" follow the leader
 let mapleader = "\<Space>"
@@ -77,9 +84,9 @@ set mat=2
 set foldcolumn=1 "left margin
 set novisualbell
 set noerrorbells
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 set smarttab
 set modelines=0
@@ -93,15 +100,18 @@ set backspace=indent,eol,start
 "" file explorer
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_winsize = 15
+let g:netrw_winsize = 10
 let g:netrw_altv = 1
 let g:netrw_browse_split = 4
+let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro nornu"
 
 "" find files recursively using :find
 set path=.,/usr/include,,**
 
 "" syntax
-colorscheme desert
+let g:gruvbox_material_background = 'hard'
+colorscheme gruvbox-material
+set background=dark
 syntax on
 filetype on
 filetype indent on
@@ -109,9 +119,6 @@ filetype indent on
 "" remaps
 " auto brackets
 inoremap {<CR> {<CR>}<Esc>O
-" jk/kj as esc
-inoremap jk <esc>
-inoremap kj <esc>
 " split navigation
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -155,16 +162,16 @@ hi User4 ctermbg=black ctermfg=lightcyan guibg=black guifg=lightcyan
 
 "" statusline functions
 function! StatuslineMode()
-    let l:mode=mode()
-    if l:mode==#"n"
-        return "NORMAL"
-    elseif l:mode==?"v"
-        return "VISUAL"
-    elseif l:mode==#"i"
-        return "INSERT"
-    elseif l:mode==#"R"
-        return "REPLACE"
-    endif
+  let l:mode=mode()
+  if l:mode==#"n"
+    return "NORMAL"
+  elseif l:mode==?"v"
+    return "VISUAL"
+  elseif l:mode==#"i"
+    return "INSERT"
+  elseif l:mode==#"R"
+    return "REPLACE"
+  endif
 endfunction
 
 function! StatuslineGitBranch()
@@ -192,29 +199,29 @@ augroup END
 
 augroup HybridNumberOnlyInActiveWindow
   autocmd!
-  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
-  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+  if &ft =~ 'vimscript\|markdown\'
+    autocmd VimEnter,WinEnter,BufWinEnter * setlocal relativenumber
+    autocmd WinLeave * setlocal norelativenumber
+  endif
 augroup END
 
-autocmd BufRead,BufNewFile *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
-autocmd BufRead,BufNewFile *.tex,*.bib setlocal nocursorline
-
-" automatically update links on read diary
-command! Diary VimwikiDiaryIndex
-augroup vimwikigroup
-    autocmd!
-    autocmd BufRead,BufNewFile diary.wiki VimwikiDiaryGenerateLinks
-augroup end
+autocmd BufRead,BufNewFile,BufFilePre *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
 " auto mkdir if saving to dir that doesnt exist
 " useful for vimwiki subfolders
 fun! <SID>AutoMakeDirectory()
-    let s:directory = expand("<afile>:p:h")
-    if !isdirectory(s:directory)
-        call mkdir(s:directory, "p")
-    endif
+  let s:directory = expand("<afile>:p:h")
+  if !isdirectory(s:directory)
+    call mkdir(s:directory, "p")
+  endif
 endfun
 autocmd BufWritePre,FileWritePre * :call <SID>AutoMakeDirectory()
 
 " wrap git commit lines to 72 chars
 au FileType gitcommit setlocal tw=72
+
+" auto close netrw buffer
+autocmd FileType netrw setl bufhidden=wipe
+
+" auto fill vimwiki diary entries with template
+au BufNewFile ~/drive/wiki/wiki.work/diary/*.md :silent 0r !~/.vim/bin/generate-vimwiki-diary-template

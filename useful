@@ -1,9 +1,0 @@
-listen for snmp traps:
-snmptrapd -f -m +ALL -Lo  -c /tmp/snmptrapd.conf 9876
- -> requires 'disableAuthorization yes' in /tmp/snmptrapd.conf'
-
-send snmp trap:
-snmptrap -v 2c -c public localhost '' netSnmpExampleHeartbeatNotification netSnmpExampleHeartbeatRate i 123456
-
-search files for regex:
-grep -rwn /path/ -e 'regex'
