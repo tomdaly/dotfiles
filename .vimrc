@@ -135,6 +135,8 @@ map <leader>tm :tabmove<CR>
 nnoremap gb :ls<CR>:b<Space>
 " spellcheck
 map <leader>s :setlocal spell!<CR>
+" fuzzy finder
+nnoremap gf :e<Space>**/*
 
 
 "" statusline
@@ -225,3 +227,35 @@ autocmd FileType netrw setl bufhidden=wipe
 
 " auto fill vimwiki diary entries with template
 au BufNewFile ~/drive/wiki/wiki.work/diary/*.md :silent 0r !~/.vim/bin/generate-vimwiki-diary-template
+
+" fix ctrl-L refreshing netrw instead of moving vim-tmux-navigator right 2020-02-04
+augroup netrw_mapping
+  autocmd!
+  autocmd filetype netrw call NetrwMapping()
+augroup END
+
+function! NetrwMapping()
+  nnoremap <buffer> <c-l> :wincmd l<cr>
+endfunction
+
+" from https://stackoverflow.com/a/7321131 - 2020-02-05
+function! DeleteInactiveBufs()
+    "From tabpagebuflist() help, get a list of all buffers in all tabs
+    let tablist = []
+    for i in range(tabpagenr('$'))
+        call extend(tablist, tabpagebuflist(i + 1))
+    endfor
+
+    "Below originally inspired by Hara Krishna Dara and Keith Roberts
+    "http://tech.groups.yahoo.com/group/vim/message/56425
+    let nWipeouts = 0
+    for i in range(1, bufnr('$'))
+        if bufexists(i) && !getbufvar(i,"&mod") && index(tablist, i) == -1
+        "bufno exists AND isn't modified AND isn't in the list of buffers open in windows and tabs
+            silent exec 'bwipeout' i
+            let nWipeouts = nWipeouts + 1
+        endif
+    endfor
+    echomsg nWipeouts . ' buffer(s) wiped out'
+endfunction
+command! Bdi :call DeleteInactiveBufs()

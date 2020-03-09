@@ -1,3 +1,7 @@
 # custom aliases
 alias v="vim"
-alias ll="ls -laF"
+alias g="git"
+alias grp="grep . -rnie"
+alias fnd="find . -name"
+alias ls="ls -G"
+alias ll="ls -laFG"
