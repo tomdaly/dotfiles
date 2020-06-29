@@ -438,3 +438,6 @@ debug:
 #   - AppKeypad
 key_bindings:
   - { key: Key3,     mods: Alt,     chars: "#"                               }
+  - { key: N, mods: Command, action: SpawnNewInstance }
+  - { key: W, mods: Command, action: None }
+

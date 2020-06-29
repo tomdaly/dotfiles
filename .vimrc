@@ -1,56 +1,99 @@
 set nocompatible
 
-"" Vundle
-set rtp+=$HOME/.vim/bundle/Vundle.vim
-call vundle#begin('$HOME/.vim/bundle/')
-"" install plugins here
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'w0rp/ale'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'VimWiki/vimwiki'
-Bundle 'edkolev/tmuxline.vim'
-Plugin 'junegunn/goyo.vim'
-call vundle#end()
-filetype plugin indent on
+"" plug-vim
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent execute "!curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  autocmd VimEnter * PlugInstall | source $MYVIMRC
+endif
+call plug#begin('~/.vim/plugged')
+Plug 'tpope/vim-fugitive'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'edkolev/tmuxline.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'sheerun/vim-polyglot'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'thaerkh/vim-workspace'
+Plug 'airblade/vim-gitgutter'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'jremmen/vim-ripgrep'
+Plug 'stefandtw/quickfix-reflector.vim'
+Plug 'wakatime/vim-wakatime'
+call plug#end()
 
-"" vimwiki 
-let wiki_1 = {}
-let wiki_1.path = '~/drive/wiki/wiki.work'
-let wiki_1.path_html = '~/drive/wiki/wiki.work_html'
-let wiki_1.template_path = '~/drive/wiki/wiki.work/templates'
-let wiki_1.template_default = 'default'
-let wiki_1.template_ext = '.html'
-let wiki_1.syntax = 'markdown'
-let wiki_1.ext = '.md'
-let wiki_1.custom_wiki2html = 'vimwiki_markdown'
-let wiki_1.html_filename_parameterization = 1
+"" access wiki
+nmap <leader>ww :e ~/drive/wiki/SUMMARY.md<CR>
+:noremap <leader>gf :e <cfile>
 
-let wiki_2 = {}
-let wiki_2.path = '~/drive/wiki/wiki.home'
-let wiki_2.path_html = '~/drive/wiki/wiki.home_html'
-let wiki_2.template_path = '~/drive/wiki/wiki.home/templates'
-let wiki_2.template_default = 'default'
-let wiki_2.template_ext = '.html'
-let wiki_2.syntax = 'markdown'
-let wiki_2.ext = '.md'
-let wiki_2.custom_wiki2html = 'vimwiki_markdown'
-let wiki_2.html_filename_parameterization = 1
+"" tmuxline
+let g:tmuxline_preset = 'zenburn'
 
-let g:vimwiki_list = [wiki_1, wiki_2]
-let g:vimwiki_ext2syntax = {'.md' : 'markdown'}
-let g:vimwiki_list_ignore_newline = 0
-let g:vimwiki_text_ignore_newline = 0
-let g:vimwiki_global_ext = 0  " ignore .md files outside wiki dir
+"" goyo/limelight writing mode
+let g:goyo_width='80%'
+let g:goyo_height='70%'
+let g:limelight_conceal_ctermfg = 'gray'
+let g:limelight_conceal_ctermfg = 240
+:command Write colorscheme typewriter | Goyo | Limelight!!
+:command Code colorscheme gruvbox-material | set background='dark' | Goyo! | Limelight!!
 
-"" ale
-let g:ale_completion_enabled = 1
-let g:ale_linters = {
-      \  'javascript': ['eslint'],
-      \}
+"" coc
+""" from neoclide/coc.nvim README
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-"" goyo
-let g:goyo_width = 220
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+if has('patch8.1.1068')
+  " Use `complete_info` if your (Neo)Vim version supports it.
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+let g:coc_global_extensions = [
+  \ 'coc-snippets',
+  \ 'coc-tsserver',
+  \ 'coc-eslint', 
+  \ 'coc-prettier', 
+  \ 'coc-json', 
+  \ ]
+
+
+"" vim-workspace
+let g:workspace_session_directory = $HOME . '/.vim/sessions/'
+let g:workspace_session_disable_on_args = 1
+
+"" vim-ripgrep + ctrlP
+if executable('rg')
+  let g:rg_command = 'rg --vimgrep -S'
+  let g:ctrlp_user_command = 'rg %s --files --hidden --color=never --glob ""'
+endif
+let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 
 "" follow the leader
 let mapleader = "\<Space>"
@@ -64,9 +107,9 @@ set autoread
 set ai "autoindent
 set si "smartindent
 set wrap
-set nobackup
 set noswapfile
-set noundofile
+set backupdir=/tmp/
+set undodir=/tmp/
 set nowb
 set number relativenumber
 set cursorline
@@ -96,6 +139,11 @@ set splitright
 set completeopt=longest,menuone
 set so=4
 set backspace=indent,eol,start
+set hidden
+set cmdheight=2
+set shortmess+=c
+set signcolumn=yes
+
 
 "" file explorer
 let g:netrw_liststyle = 3
@@ -113,19 +161,17 @@ let g:gruvbox_material_background = 'hard'
 colorscheme gruvbox-material
 set background=dark
 syntax on
+syntax sync fromstart
 filetype on
 filetype indent on
+filetype plugin indent on
 
 "" remaps
-" auto brackets
-inoremap {<CR> {<CR>}<Esc>O
 " split navigation
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
-" fast saving
-nmap <leader>w :w!<CR>
 " tabs
 map <leader>tn :tabnew<CR>
 map <leader>tc :tabclose<CR>
@@ -135,9 +181,14 @@ map <leader>tm :tabmove<CR>
 nnoremap gb :ls<CR>:b<Space>
 " spellcheck
 map <leader>s :setlocal spell!<CR>
-" fuzzy finder
-nnoremap gf :e<Space>**/*
-
+" move between lines
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
+" don't jump to next word using *
+" aka use *cgn to change word under cursor, then . to repeat
+nnoremap * :keepjumps normal! mi*`i<CR>
+" quick save
+nnoremap <Return> :w<CR>
 
 "" statusline
 set laststatus=2
@@ -210,7 +261,6 @@ augroup END
 autocmd BufRead,BufNewFile,BufFilePre *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
 " auto mkdir if saving to dir that doesnt exist
-" useful for vimwiki subfolders
 fun! <SID>AutoMakeDirectory()
   let s:directory = expand("<afile>:p:h")
   if !isdirectory(s:directory)
@@ -225,9 +275,6 @@ au FileType gitcommit setlocal tw=72
 " auto close netrw buffer
 autocmd FileType netrw setl bufhidden=wipe
 
-" auto fill vimwiki diary entries with template
-au BufNewFile ~/drive/wiki/wiki.work/diary/*.md :silent 0r !~/.vim/bin/generate-vimwiki-diary-template
-
 " fix ctrl-L refreshing netrw instead of moving vim-tmux-navigator right 2020-02-04
 augroup netrw_mapping
   autocmd!
@@ -238,24 +285,32 @@ function! NetrwMapping()
   nnoremap <buffer> <c-l> :wincmd l<cr>
 endfunction
 
-" from https://stackoverflow.com/a/7321131 - 2020-02-05
-function! DeleteInactiveBufs()
-    "From tabpagebuflist() help, get a list of all buffers in all tabs
-    let tablist = []
-    for i in range(tabpagenr('$'))
-        call extend(tablist, tabpagebuflist(i + 1))
-    endfor
-
-    "Below originally inspired by Hara Krishna Dara and Keith Roberts
-    "http://tech.groups.yahoo.com/group/vim/message/56425
-    let nWipeouts = 0
-    for i in range(1, bufnr('$'))
-        if bufexists(i) && !getbufvar(i,"&mod") && index(tablist, i) == -1
-        "bufno exists AND isn't modified AND isn't in the list of buffers open in windows and tabs
-            silent exec 'bwipeout' i
-            let nWipeouts = nWipeouts + 1
-        endif
-    endfor
-    echomsg nWipeouts . ' buffer(s) wiped out'
+"" zettel template 2020-05-15
+:command Zettel call LoadZettel()
+function LoadZettel()
+  lcd $HOME/drive/kasten
+  enew
+  silent! execute '0r ~/.vim/templates/zettel.tpl'
+  %substitute#\[:VIM_EVAL:\]\(.\{-\}\)\[:END_EVAL:\]#\=eval(submatch(1))#ge
 endfunction
-command! Bdi :call DeleteInactiveBufs()
+
+"" quick compile/run c++, python3 2020-05-29
+autocmd FileType cpp map <buffer> <F6> :w<CR>:exec '!clear;g++ -o out % && ./out' shellescape(@%, 1)<CR>
+autocmd FileType cpp imap <buffer> <F6> <esc>:w<CR>:exec '!clear;g++ -o out % && ./out' shellescape(@%, 1)<CR>
+autocmd FileType python map <buffer> <F6> :w<CR>:exec '!clear;python3' shellescape(@%, 1)<CR>
+autocmd FileType python imap <buffer> <F6> <esc>:w<CR>:exec '!clear;python3' shellescape(@%, 1)<CR>
+
+"" zoom into split (like tmux) 2020-06-05
+function! s:zoom_toggle() abort
+  if 1 == winnr('$') | return | endif
+  let restore_cmd = winrestcmd()
+  wincmd |
+  wincmd _
+  " If the layout did not change, it's a toggle (un-zoom).
+  if restore_cmd ==# winrestcmd()
+    exe t:zoom_restore
+  else
+    let t:zoom_restore = restore_cmd
+  endif
+endfunction
+nnoremap <leader>z :<C-u>call <SID>zoom_toggle()<CR>
