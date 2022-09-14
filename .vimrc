@@ -1,4 +1,8 @@
 set nocompatible
+set shell=/bin/zsh
+
+"" follow the leader
+let mapleader = "\<Space>"
 
 "" plug-vim
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -7,82 +11,69 @@ if empty(glob('~/.vim/autoload/plug.vim'))
 endif
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rhubarb'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'edkolev/tmuxline.vim'
-Plug 'junegunn/goyo.vim'
-Plug 'junegunn/limelight.vim'
 Plug 'sheerun/vim-polyglot'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
+Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
+Plug 'neovim/nvim-lspconfig'
 Plug 'thaerkh/vim-workspace'
 Plug 'airblade/vim-gitgutter'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'jremmen/vim-ripgrep'
 Plug 'stefandtw/quickfix-reflector.vim'
-Plug 'wakatime/vim-wakatime'
+Plug 'simeji/winresizer'
+Plug 'wincent/terminus'
+Plug 'junegunn/goyo.vim'
+Plug 'ayu-theme/ayu-vim'
+Plug 'tpope/vim-dispatch'
+Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
+Plug 'dbeniamine/cheat.sh-vim'
+Plug 'puremourning/vimspector'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 call plug#end()
 
-"" access wiki
-nmap <leader>ww :e ~/drive/wiki/SUMMARY.md<CR>
-:noremap <leader>gf :e <cfile>
+"" coq.nvim
+"let g:coq_settings = { 'keymap.jump_to_mark' : '', 'display.icons.mode': 'none', 'auto_start': 'shut-up' }
+""" coq LSP
+lua << EOF
+require'lspconfig'.tsserver.setup{} -- TypeScript
+require'lspconfig'.eslint.setup{} -- ESLint (TS/JS)
+require'lspconfig'.gopls.setup{} -- GoLang
+require'lspconfig'.solargraph.setup{} -- Ruby
+require'lspconfig'.terraformls.setup{} -- Terraform
+local lsp = require "lspconfig"
+local coq = require "coq"
+EOF
+
+"" lsp_lines
+lua << EOF
+require("lsp_lines").setup()
+vim.diagnostic.config({
+  virtual_text = false,
+})
+EOF
+
+"" vimspector
+let g:vimspector_base_dir='$HOME/.vim/plugged/vimspector'
+let g:vimspector_enable_mappings = 'HUMAN'
+nnoremap <Leader>dd :call vimspector#Launch()<CR>
+nnoremap <Leader>de :call vimspector#Reset()<CR>
+nnoremap <Leader>dc :call vimspector#Continue()<CR>
+
+nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
+nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
+
+nmap <Leader>dk <Plug>VimspectorRestart
+nmap <Leader>dh <Plug>VimspectorStepOut
+nmap <Leader>dl <Plug>VimspectorStepInto
+nmap <Leader>dj <Plug>VimspectorStepOver
+
 
 "" tmuxline
-let g:tmuxline_preset = 'zenburn'
-
-"" goyo/limelight writing mode
-let g:goyo_width='80%'
-let g:goyo_height='70%'
-let g:limelight_conceal_ctermfg = 'gray'
-let g:limelight_conceal_ctermfg = 240
-:command Write colorscheme typewriter | Goyo | Limelight!!
-:command Code colorscheme gruvbox-material | set background='dark' | Goyo! | Limelight!!
-
-"" coc
-""" from neoclide/coc.nvim README
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-if has('patch8.1.1068')
-  " Use `complete_info` if your (Neo)Vim version supports it.
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-endif
-
-" Use `[g` and `]g` to navigate diagnostics
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
-" Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
-
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-let g:coc_global_extensions = [
-  \ 'coc-snippets',
-  \ 'coc-tsserver',
-  \ 'coc-eslint', 
-  \ 'coc-prettier', 
-  \ 'coc-json', 
-  \ ]
-
+let g:tmuxline_theme = 'jellybeans'
+let g:tmuxline_preset = 'minimal'
+let g:tmuxline_status_justify = 'centre'
 
 "" vim-workspace
 let g:workspace_session_directory = $HOME . '/.vim/sessions/'
@@ -91,25 +82,44 @@ let g:workspace_session_disable_on_args = 1
 "" vim-ripgrep + ctrlP
 if executable('rg')
   let g:rg_command = 'rg --vimgrep -S'
-  let g:ctrlp_user_command = 'rg %s --files --hidden --color=never --glob ""'
+  let g:ctrlp_user_command = '[ $PWD = $HOME ] && echo "in HOME dir" || rg %s --files --hidden --ignore --color=never --glob ""'
 endif
-let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 
-"" follow the leader
-let mapleader = "\<Space>"
-let maplocalleader = "\\"
+let g:ctrlp_working_path_mode = 0
+
+"" FZF
+nnoremap <C-P> :FZF<CR>
+nnoremap <silent> <Leader>rg :Rg <C-R><C-W><CR>
+
+"" vim-tmux-navigator
+"" disable tmux navigator when zooming the Vim pane
+let g:tmux_navigator_disable_when_zoomed = 1
+
+"" goyo
+let g:goyo_width = '80%'
+let g:goyo_height = '70%'
+
 
 "" begin custom
 set encoding=utf-8
 set scrolloff=4
 set noshowmode
 set autoread
-set ai "autoindent
-set si "smartindent
+set cindent
 set wrap
 set noswapfile
-set backupdir=/tmp/
-set undodir=/tmp/
+""" stop fucking creating undodir in my local directory PLEASE
+if !isdirectory($HOME."/.vim")
+    call mkdir($HOME."/.vim", "", 0770)
+endif
+if !isdirectory($HOME."/.vim/undo-dir")
+    call mkdir($HOME."/.vim/undo-dir", "", 0700)
+endif
+set undodir=~/.vim/undo-dir
+set undofile
+set undofile
+set undodir=~/.vim/undodir/
+set backupdir=/.vim/backupdir/
 set nowb
 set number relativenumber
 set cursorline
@@ -124,7 +134,7 @@ set smartcase
 set magic "regex
 set showmatch
 set mat=2
-set foldcolumn=1 "left margin
+set foldcolumn=1 "left margin, for gitgutter
 set novisualbell
 set noerrorbells
 set tabstop=2
@@ -148,7 +158,7 @@ set signcolumn=yes
 "" file explorer
 let g:netrw_liststyle = 3
 let g:netrw_banner = 0
-let g:netrw_winsize = 10
+let g:netrw_winsize = 20
 let g:netrw_altv = 1
 let g:netrw_browse_split = 4
 let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro nornu"
@@ -156,10 +166,11 @@ let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro nornu"
 "" find files recursively using :find
 set path=.,/usr/include,,**
 
+"" colours
+set termguicolors
+colorscheme jellybeans
+
 "" syntax
-let g:gruvbox_material_background = 'hard'
-colorscheme gruvbox-material
-set background=dark
 syntax on
 syntax sync fromstart
 filetype on
@@ -188,7 +199,10 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 " aka use *cgn to change word under cursor, then . to repeat
 nnoremap * :keepjumps normal! mi*`i<CR>
 " quick save
-nnoremap <Return> :w<CR>
+nnoremap <expr> <CR> &buftype ==# 'quickfix' ? "\<CR>" : ":w<CR>"
+" previous buffer
+nnoremap <leader>b <C-^><CR>
+vnoremap <leader>il y<esc>oconsole.log('<c-r>"', <c-r>");<esc>
 
 "" statusline
 set laststatus=2
@@ -206,11 +220,11 @@ set statusline+=%3*\%h%m%r  " flags
 set statusline+=%4*\%{b:gitbranch}
 set statusline+=%3*\%.25F
 set statusline+=%3*\::
-set statusline+=%3*\%l/%L\\| " lines
+set statusline+=%3*\%c,%l/%L\\| " lines
 set statusline+=%3*\%y" type
 hi User1 ctermbg=black ctermfg=grey guibg=black guifg=grey
-hi User2 ctermbg=green ctermfg=black guibg=green guifg=black
-hi User3 ctermbg=black ctermfg=lightgreen guibg=black guifg=lightgreen
+hi User2 ctermbg=lightgreen ctermfg=black guibg=lightgreen guifg=black
+hi User3 ctermbg=black ctermfg=lightblue guibg=black guifg=lightblue
 hi User4 ctermbg=black ctermfg=lightcyan guibg=black guifg=lightcyan
 
 "" statusline functions
@@ -224,6 +238,8 @@ function! StatuslineMode()
     return "INSERT"
   elseif l:mode==#"R"
     return "REPLACE"
+  else
+    return "COMMAND"
   endif
 endfunction
 
@@ -238,6 +254,9 @@ function! StatuslineGitBranch()
     endif
   endif
 endfunction
+
+" auto :e to get file changes on focus change
+au FocusGained,BufEnter * :checktime
 
 augroup GetGitBranch
   autocmd!
@@ -258,7 +277,16 @@ augroup HybridNumberOnlyInActiveWindow
   endif
 augroup END
 
-autocmd BufRead,BufNewFile,BufFilePre *.htm,*.html,*.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
+" filetypes
+au BufRead,BufNewFile,BufFilePre *.htm,*.html,*.css,*.js setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
+au BufNewFile,BufRead *.py
+    \ setlocal tabstop=4 |
+    \ setlocal softtabstop=4 |
+    \ setlocal shiftwidth=4 |
+    \ setlocal expandtab |
+    \ setlocal autoindent |
+    \ setlocal fileformat=unix
 
 " auto mkdir if saving to dir that doesnt exist
 fun! <SID>AutoMakeDirectory()
@@ -314,3 +342,7 @@ function! s:zoom_toggle() abort
   endif
 endfunction
 nnoremap <leader>z :<C-u>call <SID>zoom_toggle()<CR>
+
+"" <leader>rt = run tests
+"" added ruby specific commands for rspec 2022-06-04
+""" available at ~/.vim/ftplugin/ruby

@@ -1,1 +1,4 @@
 .vscode/
+.undodir/
+.yarn/
+.vimspector.json

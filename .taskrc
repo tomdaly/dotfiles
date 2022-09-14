@@ -1,0 +1,59 @@
+# [Created by task 2.5.1 9/6/2019 10:38:38]
+# Taskwarrior program configuration file.
+# For more documentation, see http://taskwarrior.org or try 'man task', 'man task-color',
+# 'man task-sync' or 'man taskrc'
+
+# Here is an example of entries that use the default, override and blank values
+#   variable=foo   -- By specifying a value, this overrides the default
+#   variable=      -- By specifying no value, this means no default
+#   #variable=foo  -- By commenting out the line, or deleting it, this uses the default
+
+# Use the command 'task show' to see all defaults and overrides
+
+# Files
+data.location=~/.task
+
+# Color theme (uncomment one to use)
+# /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/light-16.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/light-256.theme
+include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-16.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-256.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-red-256.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-green-256.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-blue-256.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-violets-256.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-yellow-green.theme
+#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-256.theme
+
+# custom
+# show timewarrior tracking
+#journal.time = on
+weekstart = monday
+search.case.sensitive = no
+alias.burndown = burndown.daily
+active.indicator = >
+
+# default to task report 'ready'
+default.command = ready
+report.ready.columns = start.active,id,depends.list,project,due.relative,description.desc
+report.ready.filter = status:pending limit:page -BLOCKED (+next) 
+report.ready.labels =,ID,Deps,Project,Due,Description
+
+# inbox report
+report.in.columns           = id,description
+report.in.description       = Inbox
+report.in.filter            = status:pending limit:page (+in)
+report.in.labels            = ID,Description
+
+# aliases
+alias.dailystatus = status:completed end.after:today all
+alias.punt = modify wait:1d
+alias.someday = mod +someday wait:someday
+
+# taskwarrior-web 
+task-web.filter = status:pending
+news.version=2.6.0
+
+# remove 'urgency' nag; I know things are urgent, I don't need my computer to tell me
+nag=

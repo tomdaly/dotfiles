@@ -1,0 +1,13 @@
+[user]
+	name = tomdaly
+	email = tomdaly@users.noreply.github.com
+	signingkey = 8F31A3C2
+[core]
+	editor = nvim
+	excludesFile = ~/.gitignore_global
+[gpg]
+	program = /opt/homebrew/bin/gpg
+[commit]
+	gpgsign = true
+[pull]
+	ff = only
