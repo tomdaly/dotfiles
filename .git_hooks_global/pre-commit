@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# pass IGNORE_TODOS=true to skip hook
+[[ ! -z "${IGNORE_TODOS}" ]] && exit 0
+
+. git-sh-setup  # for die
+if git-diff-index -p -M --cached HEAD -- \
+| grep '^+' \
+| grep 'TODO'; then
+    die 'TODO detected in patch! Blocking commit'
+fi
+
+# auto linting is useful here too

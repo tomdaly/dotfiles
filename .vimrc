@@ -17,6 +17,7 @@ Plug 'edkolev/tmuxline.vim'
 Plug 'sheerun/vim-polyglot'
 Plug 'ms-jpq/coq_nvim', {'branch': 'coq'}
 Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
+Plug 'ms-jpq/coq.thirdparty', {'branch': '3p'}
 Plug 'neovim/nvim-lspconfig'
 Plug 'thaerkh/vim-workspace'
 Plug 'airblade/vim-gitgutter'
@@ -31,20 +32,51 @@ Plug 'dbeniamine/cheat.sh-vim'
 Plug 'puremourning/vimspector'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'github/copilot.vim'
 call plug#end()
 
 "" coq.nvim
-"let g:coq_settings = { 'keymap.jump_to_mark' : '', 'display.icons.mode': 'none', 'auto_start': 'shut-up' }
 """ coq LSP
 lua << EOF
-require'lspconfig'.tsserver.setup{} -- TypeScript
+vim.g.coq_settings = {
+  keymap = {
+    jump_to_mark = '',
+  },
+  auto_start = false, -- or 'shut-up'. disabled for copilot 2022-11-07
+  display = {
+    pum = {
+      fast_close = false
+    },
+    icons = {
+      mode = 'none'
+    }
+  }
+}
 require'lspconfig'.eslint.setup{} -- ESLint (TS/JS)
 require'lspconfig'.gopls.setup{} -- GoLang
 require'lspconfig'.solargraph.setup{} -- Ruby
-require'lspconfig'.terraformls.setup{} -- Terraform
+-- require'lspconfig'.terraformls.setup{} -- Terraform
+ -- (disabled 2022-10-05 as crashes M1! https://github.com/hashicorp/terraform/issues/31467)
+ -- (re-enabled 2022-11-11 after disabling IPv6 on M1 (System Preferences, Wi-Fi, Advanced, TCP/IP, IPv6 -> 'Link-local only'))
+ -- disabled again 2022-12-09, slow as fuck
 local lsp = require "lspconfig"
 local coq = require "coq"
+-- third party LSPs for copilot + coq
+-- disabled 2022-12-08 as not working
+--require("coq_3p") {
+--  { src = "copilot", short_name = "COP", accept_key = "<c-r>" },
+--}
 EOF
+
+"" copilot remapping (default: <Tab>)
+"imap <silent><script><expr> <Leader>h copilot#Accept("\<CR>")
+"let g:copilot_no_tab_map = v:true
+imap <silent> <C-]> <Plug>(copilot-next)
+imap <silent> <C-[> <Plug>(copilot-previous)
+imap <silent> <C-#> <Plug>(copilot-dismiss)
+
+""" auto fix eslint errors on save
+autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
 
 "" lsp_lines
 lua << EOF
@@ -55,20 +87,19 @@ vim.diagnostic.config({
 EOF
 
 "" vimspector
-let g:vimspector_base_dir='$HOME/.vim/plugged/vimspector'
+let g:vimspector_base_dir=expand('$HOME/.vim/plugged/vimspector')
 let g:vimspector_enable_mappings = 'HUMAN'
 nnoremap <Leader>dd :call vimspector#Launch()<CR>
-nnoremap <Leader>de :call vimspector#Reset()<CR>
+nnoremap <Leader>dx :call vimspector#Reset()<CR>
 nnoremap <Leader>dc :call vimspector#Continue()<CR>
 
 nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
 nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
 
-nmap <Leader>dk <Plug>VimspectorRestart
+nmap <Leader>dr <Plug>VimspectorRestart
 nmap <Leader>dh <Plug>VimspectorStepOut
 nmap <Leader>dl <Plug>VimspectorStepInto
 nmap <Leader>dj <Plug>VimspectorStepOver
-
 
 "" tmuxline
 let g:tmuxline_theme = 'jellybeans'
@@ -87,8 +118,9 @@ endif
 
 let g:ctrlp_working_path_mode = 0
 
-"" FZF
+"" FZF + Rg
 nnoremap <C-P> :FZF<CR>
+nnoremap <C-F> :Rg<CR>
 nnoremap <silent> <Leader>rg :Rg <C-R><C-W><CR>
 
 "" vim-tmux-navigator
@@ -134,7 +166,7 @@ set smartcase
 set magic "regex
 set showmatch
 set mat=2
-set foldcolumn=1 "left margin, for gitgutter
+set foldcolumn=0
 set novisualbell
 set noerrorbells
 set tabstop=2
@@ -152,8 +184,9 @@ set backspace=indent,eol,start
 set hidden
 set cmdheight=2
 set shortmess+=c
-set signcolumn=yes
-
+set signcolumn=auto:2 " show vimspector breakpoints + gitgutter signs
+set noequalalways " don't resize splits when opening a new one
+"set clipboard=unnamed " yank to system clipboard
 
 "" file explorer
 let g:netrw_liststyle = 3
@@ -168,6 +201,12 @@ set path=.,/usr/include,,**
 
 "" colours
 set termguicolors
+let g:jellybeans_overrides = {
+\    'background': { 'ctermbg': 'none', '256ctermbg': 'none' },
+\}
+if has('termguicolors') && &termguicolors
+  let g:jellybeans_overrides['background']['guibg'] = 'none'
+endif
 colorscheme jellybeans
 
 "" syntax
@@ -201,13 +240,12 @@ nnoremap * :keepjumps normal! mi*`i<CR>
 " quick save
 nnoremap <expr> <CR> &buftype ==# 'quickfix' ? "\<CR>" : ":w<CR>"
 " previous buffer
-nnoremap <leader>b <C-^><CR>
 vnoremap <leader>il y<esc>oconsole.log('<c-r>"', <c-r>");<esc>
 
 "" statusline
 set laststatus=2
 set statusline=                   " left
-set statusline+=%2*\ " blank
+set statusline+=%2*\  " blank
 set statusline+=%2*\%{StatuslineMode()}
 set statusline+=%2*\  " blank
 set statusline+=%1*\ <<
@@ -217,15 +255,18 @@ set statusline+=%=                " right
 set statusline+=%#warningmsg#
 set statusline+=%*
 set statusline+=%3*\%h%m%r  " flags
-set statusline+=%4*\%{b:gitbranch}
-set statusline+=%3*\%.25F
+"set statusline+=%4*\%{b:gitbranch} " git branch. removed 2022-11-23 as its
+""  getting in the way of file names
+"set statusline+=%3*\%.25F
 set statusline+=%3*\::
 set statusline+=%3*\%c,%l/%L\\| " lines
-set statusline+=%3*\%y" type
-hi User1 ctermbg=black ctermfg=grey guibg=black guifg=grey
+set statusline+=%3*\%y  " type
+hi StatusLine ctermbg=none ctermfg=black guibg=none guifg=black
+hi StatusLineNC ctermbg=none ctermfg=grey guibg=none guifg=grey
+hi User1 ctermbg=none ctermfg=grey guibg=none guifg=grey
 hi User2 ctermbg=lightgreen ctermfg=black guibg=lightgreen guifg=black
-hi User3 ctermbg=black ctermfg=lightblue guibg=black guifg=lightblue
-hi User4 ctermbg=black ctermfg=lightcyan guibg=black guifg=lightcyan
+hi User3 ctermbg=none ctermfg=lightblue guibg=none guifg=lightblue
+hi User4 ctermbg=none ctermfg=lightcyan guibg=none guifg=lightcyan
 
 "" statusline functions
 function! StatuslineMode()
@@ -346,3 +387,26 @@ nnoremap <leader>z :<C-u>call <SID>zoom_toggle()<CR>
 "" <leader>rt = run tests
 "" added ruby specific commands for rspec 2022-06-04
 """ available at ~/.vim/ftplugin/ruby
+
+"" close all windows + tabs except current buffer 2022-11-10
+command! BufOnly execute '%bdelete|edit#|bdelete#|normal `"'
+
+"" paste multiple times 2022-11-11
+xnoremap p pgvy
+
+"" quick format json file 2022-11-29
+nmap =j :%!python3 -m json.tool<CR>
+
+"" syntax folding w auto open
+"" commands: za toggle open/close, zA toggle nested, zR open all, zM close all
+"set foldmethod=syntax
+"au BufAdd,BufRead,BufWinEnter * normal zR
+
+"" terminal mode improvements 2022-12-01
+""" allow fzf to use different binding
+tnoremap <expr> <esc> &filetype == 'fzf' ? "\<esc>" : "\<c-\>\<c-n>"
+autocmd BufEnter * if &buftype == 'terminal' | :startinsert | endif
+autocmd TermOpen * setlocal nonumber norelativenumber
+
+"" ctags 2023-01-04
+set tags=./tags;$HOME

@@ -2,3 +2,5 @@
 .undodir/
 .yarn/
 .vimspector.json
+tags
+.rgignore

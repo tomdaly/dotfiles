@@ -5,6 +5,7 @@
 [core]
 	editor = nvim
 	excludesFile = ~/.gitignore_global
+	hooksPath = ~/.git_hooks_global
 [gpg]
 	program = /opt/homebrew/bin/gpg
 [commit]

@@ -129,16 +129,79 @@ set -o noclobber
 
 autoload -U edit-command-line
 
-# node 2022-03-28
+# lazy load node to improve shell startup time 2022-03-28
 export NVM_DIR="$HOME/.nvm"
   [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
   [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+alias nvm="unalias nvm; [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"; nvm $@"
+
+# magic space for history completion 2023-02-20
+# bind Space:magic-space # bash
+bindkey " " magic-space # zsh
+
+# m1 arch 2022-03-28
+alias abrew="/opt/homebrew/bin/brew"
+alias i="arch -x86_64"
+alias ibrew="arch -x86_64 /usr/local/bin/brew"
+_ARCH=$(arch)
+if [[ "$_ARCH" == "i386" ]]; then
+ #usr/local is X_86
+ alias bundle="arch -x86_64 bundle"
+ alias brew="ibrew"
+ # export GEM_HOME=$HOME/.gem unset for rvm
+ export PATH="/usr/local/bin:$PATH"
+ export PATH="/usr/local/opt:$PATH"
+ export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
+fi
+if [[ "$_ARCH" == "arm64" ]]; then
+ #usr/local is X_86
+ alias brew="abrew"
+ # export GEM_HOME=$HOME/.gem unset for rvm
+ export PATH=$HOME/.gems/bin:$PATH
+ export PATH="/opt/homebrew/bin:$PATH"
+ export PATH="/opt/homebrew/opt:$PATH"
+ export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+ export PATH="/opt/homebrew/opt/imagemagick@6/bin:$PATH"
+ export PATH="/opt/homebrew/opt/mysql@5.7/bin:$PATH"
+ export LDFLAGS="-L/opt/homebrew/opt/libffi/lib"
+ export CPPFLAGS="-I/opt/homebrew/opt/libffi/include"
+ export PATH="$(brew --prefix openssl@1.1)/bin:$PATH"
+ export PATH="$(brew --prefix postgresql)/bin:$PATH"
+ export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(abrew --prefix openssl@1.1)"
+ export PKG_CONFIG_PATH="/opt/homebrew/opt/libffi/lib/pkgconfig"
+fi
+
+# switch arch 2022-03-30
+alias arm="$env /usr/bin/arch -arm64 /bin/zsh --login"
+alias intel="$env /usr/bin/arch -x86_64 /bin/zsh --login"
 
 # ruby 2022-03-28
 eval "$(rbenv init - zsh)"
+
+# aws alias & region for awscli / gsts 2022-04-07
+# idp-id and sp-id need replacing with real values
+alias aws-login="gsts --idp-id ABCDEF --sp-id 1234 --force"
+export AWS_DEFAULT_REGION="eu-west-1"
+export AWS_PROFILE="saml"
+function aws-ecr-login() {
+  [[ -z $1 ]] && echo "requires account ID as arg 1" && return 1
+  aws ecr get-login-password | docker login -u AWS --password-stdin "$1.dkr.ecr.eu-west-1.amazonaws.com"
+}
+
+# codecrafters docker course 2022-05-03
+alias mydocker="docker build -t mydocker . && docker run --cap-add='SYS_ADMIN' mydocker"
 
 # add RVM to PATH for scripting 2022-07-19
 export PATH="$PATH:$HOME/.rvm/bin"
 
 # make fzf ignore .git/node_modules files
 export FZF_DEFAULT_COMMAND='rg --files --follow --hidden -g "!{node_modules/*,.git/*}"'
+
+# gopath default is $HOME/go 2022-11-04
+
+# add custom scripts to path 2023-01-04
+export PATH="$PATH:$HOME/dev/dotfiles/scripts"
+
+# ctags alias (brew instead of default mac) 2023-01-04
+alias ctags="`brew --prefix`/bin/ctags"
+
