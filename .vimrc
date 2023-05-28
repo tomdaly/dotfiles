@@ -25,14 +25,19 @@ Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'simeji/winresizer'
 Plug 'wincent/terminus'
 Plug 'junegunn/goyo.vim'
-Plug 'ayu-theme/ayu-vim'
 Plug 'tpope/vim-dispatch'
 Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
 Plug 'dbeniamine/cheat.sh-vim'
-Plug 'puremourning/vimspector'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'github/copilot.vim'
+Plug 'vim-test/vim-test'
+Plug 'mfussenegger/nvim-dap'
+Plug 'suketa/nvim-dap-ruby' " requires `gem install debug`
+Plug 'leoluz/nvim-dap-go' " requires `go install github.com/go-delve/delve/cmd/dlv@latest`
+Plug 'rcarriga/nvim-dap-ui'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'theHamsta/nvim-dap-virtual-text'
 call plug#end()
 
 "" coq.nvim
@@ -50,7 +55,7 @@ vim.g.coq_settings = {
     icons = {
       mode = 'none'
     }
-  }
+  },
 }
 require'lspconfig'.eslint.setup{} -- ESLint (TS/JS)
 require'lspconfig'.gopls.setup{} -- GoLang
@@ -64,12 +69,12 @@ local coq = require "coq"
 -- third party LSPs for copilot + coq
 -- disabled 2022-12-08 as not working
 --require("coq_3p") {
---  { src = "copilot", short_name = "COP", accept_key = "<c-r>" },
+  --{ src = "copilot", short_name = "COP", accept_key = "<c-r>" },
 --}
 EOF
 
 "" copilot remapping (default: <Tab>)
-"imap <silent><script><expr> <Leader>h copilot#Accept("\<CR>")
+imap <silent><script><expr> <Leader><CR> copilot#Accept("\<CR>")
 "let g:copilot_no_tab_map = v:true
 imap <silent> <C-]> <Plug>(copilot-next)
 imap <silent> <C-[> <Plug>(copilot-previous)
@@ -80,26 +85,53 @@ autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
 
 "" lsp_lines
 lua << EOF
-require("lsp_lines").setup()
+require('lsp_lines').setup()
 vim.diagnostic.config({
   virtual_text = false,
 })
 EOF
 
 "" vimspector
-let g:vimspector_base_dir=expand('$HOME/.vim/plugged/vimspector')
-let g:vimspector_enable_mappings = 'HUMAN'
-nnoremap <Leader>dd :call vimspector#Launch()<CR>
-nnoremap <Leader>dx :call vimspector#Reset()<CR>
-nnoremap <Leader>dc :call vimspector#Continue()<CR>
+"let g:vimspector_base_dir=expand('$HOME/.vim/plugged/vimspector')
+"let g:vimspector_enable_mappings = 'HUMAN'
+"nnoremap <Leader>dd :call vimspector#Launch()<CR>
+"nnoremap <Leader>dx :call vimspector#Reset()<CR>
+"nnoremap <Leader>dc :call vimspector#Continue()<CR>
+"
+"nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
+"nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
+"
+"nmap <Leader>dr <Plug>VimspectorRestart
+"nmap <Leader>dh <Plug>VimspectorStepOut
+"nmap <Leader>dl <Plug>VimspectorStepInto
+"nmap <Leader>dj <Plug>VimspectorStepOver
 
-nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
-nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
-
-nmap <Leader>dr <Plug>VimspectorRestart
-nmap <Leader>dh <Plug>VimspectorStepOut
-nmap <Leader>dl <Plug>VimspectorStepInto
-nmap <Leader>dj <Plug>VimspectorStepOver
+"" nvim-dap
+lua << EOF
+local dap = require('dap')
+require('dap-ruby').setup()
+require('dap-go').setup()
+require('dapui').setup()
+require('nvim-dap-virtual-text').setup()
+require('nvim-treesitter.configs').setup({
+  ensure_installed = {'ruby', 'go', 'typescript', 'javascript', 'terraform', 'python', 'json', 'yaml', 'html', 'css', 'bash', 'lua', 'vim', 'vimdoc'},
+  sync_install = false,
+  highlight = {
+    enable = true,
+  },
+  indent = {
+    enable = true,
+  },
+})
+vim.keymap.set('n', '<Leader>dt', function() dap.toggle_breakpoint() end)
+vim.keymap.set('n', '<Leader>dT', function() dap.clear_breakpoints() end)
+vim.keymap.set('n', '<Leader>dd', function() dap.continue() end)
+vim.keymap.set('n', '<Leader>dj', function() dap.step_over() end)
+vim.keymap.set('n', '<Leader>dl', function() dap.step_into() end)
+vim.keymap.set('n', '<Leader>dh', function() dap.step_out() end)
+vim.keymap.set('n', '<Leader>di', function() require('dap.ui.widgets').hover() end)
+vim.keymap.set('n', '<Leader>dI', function() require('dapui').toggle() end)
+EOF
 
 "" tmuxline
 let g:tmuxline_theme = 'jellybeans'
@@ -130,6 +162,18 @@ let g:tmux_navigator_disable_when_zoomed = 1
 "" goyo
 let g:goyo_width = '80%'
 let g:goyo_height = '70%'
+
+
+"" vim-test
+let test#strategy = "neovim"
+let g:test#neovim#start_normal = 1
+let g:test#echo_command = 0
+nmap <silent> <leader>rt :TestNearest<CR>
+nmap <silent> <leader>T :TestFile<CR>
+nmap <silent> <leader>a :TestSuite<CR>
+nmap <silent> <leader>l :TestLast<CR>
+""" visits last run test file
+nmap <silent> <leader>g :TestVisit<CR>
 
 
 "" begin custom
@@ -243,7 +287,8 @@ nnoremap <expr> <CR> &buftype ==# 'quickfix' ? "\<CR>" : ":w<CR>"
 vnoremap <leader>il y<esc>oconsole.log('<c-r>"', <c-r>");<esc>
 
 "" statusline
-set laststatus=2
+set laststatus=3
+:d
 set statusline=                   " left
 set statusline+=%2*\  " blank
 set statusline+=%2*\%{StatuslineMode()}
@@ -387,9 +432,10 @@ nnoremap <leader>z :<C-u>call <SID>zoom_toggle()<CR>
 "" <leader>rt = run tests
 "" added ruby specific commands for rspec 2022-06-04
 """ available at ~/.vim/ftplugin/ruby
+""" removed in favour of vim-test rt 2023-05-26
 
 "" close all windows + tabs except current buffer 2022-11-10
-command! BufOnly execute '%bdelete|edit#|bdelete#|normal `"'
+command! BufOnly execute '%bdelete!|edit#|bdelete#|normal `"'
 
 "" paste multiple times 2022-11-11
 xnoremap p pgvy
@@ -401,6 +447,10 @@ nmap =j :%!python3 -m json.tool<CR>
 "" commands: za toggle open/close, zA toggle nested, zR open all, zM close all
 "set foldmethod=syntax
 "au BufAdd,BufRead,BufWinEnter * normal zR
+" fold using nvim-treesitter 2023-05-26
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+set nofoldenable                     " Disable folding at startup.
 
 "" terminal mode improvements 2022-12-01
 """ allow fzf to use different binding
@@ -410,3 +460,12 @@ autocmd TermOpen * setlocal nonumber norelativenumber
 
 "" ctags 2023-01-04
 set tags=./tags;$HOME
+
+"" indent file & return to location 2023-05-26
+nmap == gg=G''
+
+" fix whatever plugin keeps stealing my Esc key 2023-05-26
+iunmap <Esc>
+
+" no background for vertical split bar
+hi VertSplit guibg=bg
