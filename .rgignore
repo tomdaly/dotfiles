@@ -2,7 +2,12 @@
 node_modules/
 .sass-cache/
 bower_components/
-build/
 dist/
 vendor/
-**/*_mock.go
+*.snap
+.undodir/
+.obsidian/
+go.sum
+Gem.lock
+yarn.lock
+package-lock.json

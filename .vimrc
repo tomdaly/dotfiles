@@ -12,6 +12,10 @@ endif
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-sensible'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'edkolev/tmuxline.vim'
 Plug 'sheerun/vim-polyglot'
@@ -25,7 +29,7 @@ Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'simeji/winresizer'
 Plug 'wincent/terminus'
 Plug 'junegunn/goyo.vim'
-Plug 'tpope/vim-dispatch'
+Plug 'junegunn/limelight.vim'
 Plug 'https://git.sr.ht/~whynothugo/lsp_lines.nvim'
 Plug 'dbeniamine/cheat.sh-vim'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -38,6 +42,17 @@ Plug 'leoluz/nvim-dap-go' " requires `go install github.com/go-delve/delve/cmd/d
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'theHamsta/nvim-dap-virtual-text'
+Plug 'jackMort/ChatGPT.nvim'
+Plug 'MunifTanjim/nui.nvim' " for chatgpt.nvim
+Plug 'nvim-lua/plenary.nvim' " for chatgpt.nvim, todo-comments.nvim, octo.nvim
+Plug 'nvim-telescope/telescope.nvim' " for chatgpt.nvim, octo.nvim
+Plug 'justinmk/vim-sneak'
+Plug 'vimwiki/vimwiki'
+Plug 'folke/todo-comments.nvim'
+Plug 'nvim-tree/nvim-web-devicons' " for octo.nvim
+Plug 'pwntester/octo.nvim'
+Plug 'rebelot/kanagawa.nvim'
+
 call plug#end()
 
 "" coq.nvim
@@ -47,17 +62,25 @@ vim.g.coq_settings = {
   keymap = {
     jump_to_mark = '',
   },
-  auto_start = false, -- or 'shut-up'. disabled for copilot 2022-11-07
+  auto_start = false, -- 'false' or 'shut-up'. enabled 2023-10-30
   display = {
     pum = {
       fast_close = false
     },
     icons = {
-      mode = 'none'
+      mode = 'long' -- 'none', 'short' or 'long'
     }
   },
 }
-require'lspconfig'.eslint.setup{} -- ESLint (TS/JS)
+require'lspconfig'.eslint.setup({ -- ESLint (TS/JS)
+  --- ...
+  on_attach = function(client, bufnr)
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      command = "EslintFixAll",
+    })
+  end,
+})
 require'lspconfig'.gopls.setup{} -- GoLang
 require'lspconfig'.solargraph.setup{} -- Ruby
 -- require'lspconfig'.terraformls.setup{} -- Terraform
@@ -68,9 +91,9 @@ local lsp = require "lspconfig"
 local coq = require "coq"
 -- third party LSPs for copilot + coq
 -- disabled 2022-12-08 as not working
---require("coq_3p") {
-  --{ src = "copilot", short_name = "COP", accept_key = "<c-r>" },
---}
+require("coq_3p") {
+  { src = "copilot", short_name = "COP", accept_key = "<c-f>" },
+}
 EOF
 
 "" copilot remapping (default: <Tab>)
@@ -79,9 +102,12 @@ imap <silent><script><expr> <Leader><CR> copilot#Accept("\<CR>")
 imap <silent> <C-]> <Plug>(copilot-next)
 imap <silent> <C-[> <Plug>(copilot-previous)
 imap <silent> <C-#> <Plug>(copilot-dismiss)
-
-""" auto fix eslint errors on save
-autocmd BufWritePre *.tsx,*.ts,*.jsx,*.js EslintFixAll
+""" temporarily disable typescript copilot for exercism
+let g:copilot_filetypes = {
+      \ 'markdown': v:false,
+      \ 'vimwiki': v:false,
+      \ 'typescript': v:false,
+      \ }
 
 "" lsp_lines
 lua << EOF
@@ -90,6 +116,26 @@ vim.diagnostic.config({
   virtual_text = false,
 })
 EOF
+
+"" todo-comments.nvim
+lua << EOF
+require("todo-comments").setup({
+  highlight = {
+    pattern = [[.*<(KEYWORDS)(\(.*\))?\s*:]],
+  }
+})
+EOF
+
+"" vimwiki
+let g:vimwiki_list = [{'path': '~/vault/',
+                      \ 'syntax': 'markdown', 'ext': 'md'}]
+let g:vimwiki_global_ext = 0
+let g:vimwiki_ext2syntax = {}
+let g:vimwiki_folding = 'expr:quick'
+let g:vimwiki_listsyms = ' .ox'
+let g:vimwiki_listsym_rejected = '~'
+au BufNewFile ~/vault/diary/*.md :silent 0r !~/.vim/bin/generate-vimwiki-diary-template '%'
+
 
 "" vimspector
 "let g:vimspector_base_dir=expand('$HOME/.vim/plugged/vimspector')
@@ -126,10 +172,11 @@ require('nvim-treesitter.configs').setup({
 vim.keymap.set('n', '<Leader>dt', function() dap.toggle_breakpoint() end)
 vim.keymap.set('n', '<Leader>dT', function() dap.clear_breakpoints() end)
 vim.keymap.set('n', '<Leader>dd', function() dap.continue() end)
+vim.keymap.set('n', '<Leader>dx', function() dap.terminate() end)
 vim.keymap.set('n', '<Leader>dj', function() dap.step_over() end)
 vim.keymap.set('n', '<Leader>dl', function() dap.step_into() end)
 vim.keymap.set('n', '<Leader>dh', function() dap.step_out() end)
-vim.keymap.set('n', '<Leader>di', function() require('dap.ui.widgets').hover() end)
+vim.keymap.set('n', '<Leader>di', function() require('dapui').eval() end)
 vim.keymap.set('n', '<Leader>dI', function() require('dapui').toggle() end)
 EOF
 
@@ -142,18 +189,50 @@ let g:tmuxline_status_justify = 'centre'
 let g:workspace_session_directory = $HOME . '/.vim/sessions/'
 let g:workspace_session_disable_on_args = 1
 
-"" vim-ripgrep + ctrlP
-if executable('rg')
-  let g:rg_command = 'rg --vimgrep -S'
-  let g:ctrlp_user_command = '[ $PWD = $HOME ] && echo "in HOME dir" || rg %s --files --hidden --ignore --color=never --glob ""'
-endif
+"" vim-fugitive
+nnoremap <silent> <Leader>g :G<CR>
 
-let g:ctrlp_working_path_mode = 0
+"" octo.nvim
+lua << EOF
+require('octo').setup()
+EOF
 
 "" FZF + Rg
-nnoremap <C-P> :FZF<CR>
-nnoremap <C-F> :Rg<CR>
+let g:fzf_vim = {}
+let g:fzf_vim.preview_window = ['right:40%']
+""" the 'delimiter' option with nth 3 is dependent on the '--no-column' flag
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   "rg --column --line-number --no-column --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview({'options': '--delimiter : --nth 3..'}), <bang>0)
+  "\   fzf#vim#with_preview('right:hidden', 'ctrl-/'), <bang>0)
+nnoremap <silent> <Leader>p :FZF<CR>
+nnoremap <silent> <Leader>P :Project<CR>
+nnoremap <silent> <Leader>h :History<CR>
+nnoremap <silent> <Leader>f :Rg<CR>
 nnoremap <silent> <Leader>rg :Rg <C-R><C-W><CR>
+function! s:build_quickfix_list(lines)
+  call setqflist(map(copy(a:lines), '{ "filename": v:val, "lnum": 1 }'))
+  copen
+  cc
+endfunction
+let g:fzf_action = {
+  \ 'ctrl-q': function('s:build_quickfix_list'),
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+""" fzf project navigation
+function! s:change_to_project(project)
+  exec 'lcd ~/dev/' . a:project
+  exec 'tabedit ~/dev/' . a:project
+endfunction
+command! -nargs=0 Project
+    \ call fzf#run(fzf#wrap('projects', {
+    \   'sink': function('s:change_to_project'),
+    \   'source': 'find ~/dev -name .git -maxdepth 2 | cut -d ''/'' -f 5 | sort',
+    \ }))
+""" fzf ctags generation using rgignore to exclude
+let g:fzf_vim.tags_command = 'rg --files | ctags -R --links=no -L -'
 
 "" vim-tmux-navigator
 "" disable tmux navigator when zooming the Vim pane
@@ -161,19 +240,34 @@ let g:tmux_navigator_disable_when_zoomed = 1
 
 "" goyo
 let g:goyo_width = '80%'
-let g:goyo_height = '70%'
+let g:goyo_height = '90%'
+autocmd! User GoyoEnter Limelight
+autocmd! User GoyoLeave Limelight!
+let g:limelight_conceal_guifg = '#434340'
 
 
 "" vim-test
 let test#strategy = "neovim"
-let g:test#neovim#start_normal = 1
+let g:test#neovim#start_normal = 0
 let g:test#echo_command = 0
-nmap <silent> <leader>rt :TestNearest<CR>
+let test#neovim#term_position = "horizontal bot 40"
+nmap <silent> <leader>t :TestNearest<CR>
 nmap <silent> <leader>T :TestFile<CR>
-nmap <silent> <leader>a :TestSuite<CR>
 nmap <silent> <leader>l :TestLast<CR>
 """ visits last run test file
-nmap <silent> <leader>g :TestVisit<CR>
+nmap <silent> <leader>L :TestVisit<CR>
+let test#typescript#jest#executable = 'yarn jest'
+let test#javascript#jest#executable = 'yarn jest'
+
+"" chatgpt.nvim
+lua << EOF
+  local home = vim.fn.expand("$HOME")
+  require("chatgpt").setup({
+      api_key_cmd = "gpg --decrypt " .. home .. "/openai_api_key.txt.gpg"
+  })
+EOF
+nmap <silent> <leader>c :ChatGPT<CR>
+nmap <silent> <leader>ce :ChatGPTEditWithInstructions<CR>
 
 
 "" begin custom
@@ -193,7 +287,6 @@ if !isdirectory($HOME."/.vim/undo-dir")
 endif
 set undodir=~/.vim/undo-dir
 set undofile
-set undofile
 set undodir=~/.vim/undodir/
 set backupdir=/.vim/backupdir/
 set nowb
@@ -211,6 +304,7 @@ set magic "regex
 set showmatch
 set mat=2
 set foldcolumn=0
+set foldlevel=9 " to stop all folds being closed on first 'zc'
 set novisualbell
 set noerrorbells
 set tabstop=2
@@ -228,8 +322,10 @@ set backspace=indent,eol,start
 set hidden
 set cmdheight=2
 set shortmess+=c
+set conceallevel=2
 set signcolumn=auto:2 " show vimspector breakpoints + gitgutter signs
-set noequalalways " don't resize splits when opening a new one
+"set noequalalways " don't resize splits when opening a new one
+" (disabled on 2023-08-16)
 "set clipboard=unnamed " yank to system clipboard
 
 "" file explorer
@@ -245,13 +341,17 @@ set path=.,/usr/include,,**
 
 "" colours
 set termguicolors
-let g:jellybeans_overrides = {
-\    'background': { 'ctermbg': 'none', '256ctermbg': 'none' },
-\}
-if has('termguicolors') && &termguicolors
-  let g:jellybeans_overrides['background']['guibg'] = 'none'
-endif
-colorscheme jellybeans
+set background=dark
+lua << EOF
+require('kanagawa').setup({
+    transparent = true,         -- do not set background color
+    theme = "wave",              -- Load "wave" theme when 'background' option is not set
+    background = {               -- map the value of 'background' option to a theme
+        dark = "wave",           -- "dragon"/"wave"
+    },
+})
+EOF
+colorscheme kanagawa
 
 "" syntax
 syntax on
@@ -267,10 +367,8 @@ nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 " tabs
-map <leader>tn :tabnew<CR>
+map <leader>nt :tabnew<CR>
 map <leader>tc :tabclose<CR>
-map <leader>to :tabonly<CR>
-map <leader>tm :tabmove<CR>
 " buffer switching
 nnoremap gb :ls<CR>:b<Space>
 " spellcheck
@@ -288,7 +386,6 @@ vnoremap <leader>il y<esc>oconsole.log('<c-r>"', <c-r>");<esc>
 
 "" statusline
 set laststatus=3
-:d
 set statusline=                   " left
 set statusline+=%2*\  " blank
 set statusline+=%2*\%{StatuslineMode()}
@@ -309,7 +406,7 @@ set statusline+=%3*\%y  " type
 hi StatusLine ctermbg=none ctermfg=black guibg=none guifg=black
 hi StatusLineNC ctermbg=none ctermfg=grey guibg=none guifg=grey
 hi User1 ctermbg=none ctermfg=grey guibg=none guifg=grey
-hi User2 ctermbg=lightgreen ctermfg=black guibg=lightgreen guifg=black
+hi User2 ctermbg=lightmagenta ctermfg=black guibg=lightmagenta guifg=black
 hi User3 ctermbg=none ctermfg=lightblue guibg=none guifg=lightblue
 hi User4 ctermbg=none ctermfg=lightcyan guibg=none guifg=lightcyan
 
@@ -468,4 +565,25 @@ nmap == gg=G''
 iunmap <Esc>
 
 " no background for vertical split bar
-hi VertSplit guibg=bg
+hi VertSplit guibg=white
+hi VertSplit guifg=grey
+" add split bar colour to kanagawa dragon colorscheme 2024-07-01
+hi WinSeparator guifg=#272733
+
+" markdown checkbox auto-mapping on '-' 2023-12-08
+augroup MarkdownCheckbox
+  autocmd!
+  autocmd FileType markdown nnoremap <buffer> <silent> - :call winrestview(<SID>toggle('^\s*-\s*\[\zs.\ze\]', {' ': 'x', 'x': 'o', 'o': ' '}))<cr>
+  autocmd FileType vimwiki nnoremap <buffer> <silent> - :call winrestview(<SID>toggle('^\s*-\s*\[\zs.\ze\]', {' ': 'x', 'x': 'o', 'o': ' '}))<cr>
+  autocmd FileType markdown nnoremap <buffer> <silent> ~ :call winrestview(<SID>toggle('^\s*-\s*\[\zs.\ze\]', {' ': '~', '~': ' '}))<cr>
+  autocmd FileType vimwiki nnoremap <buffer> <silent> ~ :call winrestview(<SID>toggle('^\s*-\s*\[\zs.\ze\]', {' ': '~', '~': ' '}))<cr>
+augroup END
+
+function s:toggle(pattern, dict, ...)
+  let view = winsaveview()
+  execute 'keeppatterns s/' . a:pattern . '/\=get(a:dict, submatch(0), a:0 ? a:1 : " ")/e'
+  return view
+endfunction
+
+" better markdown viewing 2024-06-25
+autocmd FileType markdown,vimwiki setlocal nonumber norelativenumber syntax=markdown

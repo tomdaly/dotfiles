@@ -166,7 +166,7 @@ if [[ "$_ARCH" == "arm64" ]]; then
  export LDFLAGS="-L/opt/homebrew/opt/libffi/lib"
  export CPPFLAGS="-I/opt/homebrew/opt/libffi/include"
  export PATH="$(brew --prefix openssl@1.1)/bin:$PATH"
- export PATH="$(brew --prefix postgresql)/bin:$PATH"
+ #export PATH="$(brew --prefix postgresql)/bin:$PATH" # disabled 2023-03-16 to stop 'Use postgresql@14 instead of deprecated postgresql' warning on shell start
  export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(abrew --prefix openssl@1.1)"
  export PKG_CONFIG_PATH="/opt/homebrew/opt/libffi/lib/pkgconfig"
 fi
@@ -196,6 +196,8 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # make fzf ignore .git/node_modules files
 export FZF_DEFAULT_COMMAND='rg --files --follow --hidden -g "!{node_modules/*,.git/*}"'
+# make fzf remember last search
+export FZF_DEFAULT_OPTS="--history=$HOME/.fzf_history"
 
 # gopath default is $HOME/go 2022-11-04
 
@@ -205,3 +207,11 @@ export PATH="$PATH:$HOME/dev/dotfiles/scripts"
 # ctags alias (brew instead of default mac) 2023-01-04
 alias ctags="`brew --prefix`/bin/ctags"
 
+# vim mode for all terminals (mostly rails console) 2023-04-13
+bindkey -v
+
+# quick login to aws
+alias aws-login="saml2aws login"
+
+# fixes spring tests
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

@@ -81,7 +81,7 @@ font:
     #   - (macOS) Menlo
     #   - (Linux) monospace
     #   - (Windows) Consolas
-    family: Source Code Pro for Powerline
+    family: SauceCodePro Nerd Font Propo
 
     # The `style` can be specified to pick a specific face.
     style: Regular
@@ -92,7 +92,7 @@ font:
     #
     # If the bold family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Source Code Pro for Powerline
+    family: SauceCodePro Nerd Font Propo
 
     # The `style` can be specified to pick a specific face.
     style: Bold
@@ -103,7 +103,7 @@ font:
     #
     # If the italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Source Code Pro for Powerline
+    family: SauceCodePro Nerd Font Propo
 
     # The `style` can be specified to pick a specific face.
     style: Italic
@@ -138,51 +138,47 @@ font:
   #
   # This is a global setting and will require a log out or restart to take
   # effect.
-  use_thin_strokes: false
+  # use_thin_strokes: false
 
 # If `true`, bold text is drawn using the bright color variants.
 draw_bold_text_with_bright_colors: true
 
-# Colors (Jellybeans)
+
+# Kanagawa Alacritty Colors
+# https://github.com/rebelot/kanagawa.nvim
 colors:
-  # Default colors
   primary:
-    background: '#161616'
-    foreground: '#e4e4e4'
+    # background: '0x1f1f28'
+    background: '0x141419'
+    foreground: '0xdcd7ba'
 
-  # Cursor volors
-  cursor:
-    text: '#feffff'
-    cursor: '#ffb472'
-
-  # Normal colors
   normal:
-    black:   '#a3a3a3'
-    red:     '#e98885'
-    green:   '#a3c38b'
-    yellow:  '#ffc68d'
-    blue:    '#a6cae2'
-    magenta: '#e7cdfb'
-    cyan:    '#00a69f'
-    white:   '#e4e4e4'
+    black:   '0x090618'
+    red:     '0xc34043'
+    green:   '0x76946a'
+    yellow:  '0xc0a36e'
+    blue:    '0x7e9cd8'
+    magenta: '0x957fb8'
+    cyan:    '0x6a9589'
+    white:   '0xc8c093'
 
-  # Bright colors
   bright:
-    black:   '#c8c8c8'
-    red:     '#ffb2b0'
-    green:   '#c8e2b9'
-    yellow:  '#ffe1af'
-    blue:    '#bddff7'
-    magenta: '#fce2ff'
-    cyan:    '#0bbdb6'
-    white:   '#feffff'
+    black:   '0x727169'
+    red:     '0xe82424'
+    green:   '0x98bb6c'
+    yellow:  '0xe6c384'
+    blue:    '0x7fb4ca'
+    magenta: '0x938aa9'
+    cyan:    '0x7aa89f'
+    white:   '0xdcd7ba'
 
-  # Selection colors
   selection:
-    text: '#5963a2'
-    background: '#f6f6f6'
+    background: '0x2d4f67'
+    foreground: '0xc8c093'
 
-indexed_colors: []
+  indexed_colors:
+    - { index: 16, color: '0xffa066' }
+    - { index: 17, color: '0xff5d62' }
 
 # Visual Bell
 #
@@ -346,8 +342,8 @@ working_directory: /Users/tomdaly
 # backend cannot be initialized.
 enable_experimental_conpty_backend: false
 
-# Send ESC (\x1b) before characters when alt is pressed.
-alt_send_esc: true
+# Send ESC (\x1b) before characters when alt is pressed. Defaults to true
+# alt_send_esc: true
 
 debug:
   # Display the time it takes to redraw each frame.

@@ -1,7 +1,6 @@
 [user]
 	name = tomdaly
 	email = tomdaly@users.noreply.github.com
-	signingkey = 8F31A3C2
 [core]
 	editor = nvim
 	excludesFile = ~/.gitignore_global
@@ -12,3 +11,17 @@
 	gpgsign = true
 [pull]
 	ff = only
+[push]
+	autoSetupRemote = true
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[diff]
+	external = difft
+[difft]
+	tool = difftastic
+[difftool]
+	prompt = false
+[difftool "difftastic"]
+	cmd = difft "$LOCAL" "$REMOTE"
+[pager]
+	difftool = true

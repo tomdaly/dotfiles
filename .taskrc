@@ -14,17 +14,18 @@
 data.location=~/.task
 
 # Color theme (uncomment one to use)
-# /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/light-16.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/light-256.theme
-include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-16.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-256.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-red-256.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-green-256.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-blue-256.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-violets-256.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-yellow-green.theme
-#include /opt/homebrew/Cellar/task/2.6.2/share/doc/task/rc/dark-256.theme
+# /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/light-16.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/light-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-16.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-red-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-green-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-blue-256.theme
+include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-gray-blue-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/solarized-dark-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-violets-256.theme
+#include /opt/homebrew/Cellar/task/3.0.2/share/doc/task/rc/dark-yellow-green.theme
 
 # custom
 # show timewarrior tracking
@@ -36,9 +37,9 @@ active.indicator = >
 
 # default to task report 'ready'
 default.command = ready
-report.ready.columns = start.active,id,depends.list,project,due.relative,description.desc
+report.ready.columns = start.active,id,depends.list,project,description.desc,due.relative
 report.ready.filter = status:pending limit:page -BLOCKED (+next) 
-report.ready.labels =,ID,Deps,Project,Due,Description
+report.ready.labels = Active,ID,Deps,Project,Description,Due
 
 # inbox report
 report.in.columns           = id,description
@@ -48,12 +49,26 @@ report.in.labels            = ID,Description
 
 # aliases
 alias.dailystatus = status:completed end.after:today all
+alias.weeklystatus = status:completed end.after:-8d all
 alias.punt = modify wait:1d
-alias.someday = mod +someday wait:someday
+#alias.later = mod +later
+#alias.someday = mod +someday wait:someday
+alias.ltr = mod +later
+alias.smd = mod +someday wait:someday
 
 # taskwarrior-web 
 task-web.filter = status:pending
-news.version=2.6.0
+news.version=3.0.2
 
 # remove 'urgency' nag; I know things are urgent, I don't need my computer to tell me
 nag=
+
+context.next.read=+next
+context.next.write=+next
+context.later.read=+later
+context.later.write=+later
+context.someday.read=+someday
+context.someday.write=+someday
+
+# taskwarrior-tui
+uda.taskwarrior-tui.task-report.show-info=false

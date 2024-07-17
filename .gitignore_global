@@ -1,6 +1,9 @@
 .vscode/
+.terraform/
 .undodir/
 .yarn/
 .vimspector.json
 tags
 .rgignore
+.starscope.db
+cscope.out
