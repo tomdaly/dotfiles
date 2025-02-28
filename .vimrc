@@ -16,6 +16,10 @@ Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-rails'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-dadbod'
+Plug 'tpope/vim-vinegar'
+Plug 'kristijanhusak/vim-dadbod-ui'
+Plug 'kristijanhusak/vim-dadbod-completion'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'edkolev/tmuxline.vim'
 Plug 'sheerun/vim-polyglot'
@@ -40,63 +44,136 @@ Plug 'mfussenegger/nvim-dap'
 Plug 'suketa/nvim-dap-ruby' " requires `gem install debug`
 Plug 'leoluz/nvim-dap-go' " requires `go install github.com/go-delve/delve/cmd/dlv@latest`
 Plug 'rcarriga/nvim-dap-ui'
+Plug 'nvim-neotest/nvim-nio'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'theHamsta/nvim-dap-virtual-text'
 Plug 'jackMort/ChatGPT.nvim'
-Plug 'MunifTanjim/nui.nvim' " for chatgpt.nvim
-Plug 'nvim-lua/plenary.nvim' " for chatgpt.nvim, todo-comments.nvim, octo.nvim
+Plug 'MunifTanjim/nui.nvim' " for chatgpt.nvim, avante.nvim
+Plug 'nvim-lua/plenary.nvim' " for chatgpt.nvim, todo-comments.nvim, octo.nvim, avante.nvim
 Plug 'nvim-telescope/telescope.nvim' " for chatgpt.nvim, octo.nvim
 Plug 'justinmk/vim-sneak'
 Plug 'vimwiki/vimwiki'
 Plug 'folke/todo-comments.nvim'
-Plug 'nvim-tree/nvim-web-devicons' " for octo.nvim
-Plug 'pwntester/octo.nvim'
 Plug 'rebelot/kanagawa.nvim'
+Plug 'voldikss/vim-floaterm'
+Plug 'pwntester/octo.nvim'
+Plug 'nvim-tree/nvim-web-devicons' " for octo.nvim, avante.nvim
+" 2024-08-30
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'prichrd/netrw.nvim'
+" 2024-11-07
+Plug 'stevearc/dressing.nvim' " for avante.nvim
+Plug 'HakonHarnes/img-clip.nvim'
+Plug 'yetone/avante.nvim', { 'branch': 'main', 'do': 'make' }
 
 call plug#end()
 
 "" coq.nvim
 """ coq LSP
-lua << EOF
-vim.g.coq_settings = {
-  keymap = {
-    jump_to_mark = '',
-  },
-  auto_start = false, -- 'false' or 'shut-up'. enabled 2023-10-30
-  display = {
-    pum = {
-      fast_close = false
-    },
-    icons = {
-      mode = 'long' -- 'none', 'short' or 'long'
-    }
-  },
-}
-require'lspconfig'.eslint.setup({ -- ESLint (TS/JS)
-  --- ...
-  on_attach = function(client, bufnr)
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = bufnr,
-      command = "EslintFixAll",
-    })
-  end,
-})
-require'lspconfig'.gopls.setup{} -- GoLang
-require'lspconfig'.solargraph.setup{} -- Ruby
--- require'lspconfig'.terraformls.setup{} -- Terraform
- -- (disabled 2022-10-05 as crashes M1! https://github.com/hashicorp/terraform/issues/31467)
- -- (re-enabled 2022-11-11 after disabling IPv6 on M1 (System Preferences, Wi-Fi, Advanced, TCP/IP, IPv6 -> 'Link-local only'))
- -- disabled again 2022-12-09, slow as fuck
-local lsp = require "lspconfig"
-local coq = require "coq"
--- third party LSPs for copilot + coq
--- disabled 2022-12-08 as not working
-require("coq_3p") {
-  { src = "copilot", short_name = "COP", accept_key = "<c-f>" },
-}
-EOF
+" disabled 2024-08-30 for coc.nvim
+"" lua << EOF
+"" vim.g.coq_settings = {
+""   keymap = {
+""     jump_to_mark = '',
+""   },
+""   auto_start = false, -- 'false' or 'shut-up'. enabled 2023-10-30
+""   display = {
+""     pum = {
+""       fast_close = false
+""     },
+""     icons = {
+""       mode = 'long' -- 'none', 'short' or 'long'
+""     }
+""   },
+"" }
+"" require'lspconfig'.eslint.setup({ -- ESLint (TS/JS)
+""   --- ...
+""   on_attach = function(client, bufnr)
+""     vim.api.nvim_create_autocmd("BufWritePre", {
+""       buffer = bufnr,
+""       command = "EslintFixAll",
+""     })
+""   end,
+"" })
+"" require'lspconfig'.gopls.setup{} -- GoLang
+"" require'lspconfig'.solargraph.setup{} -- Ruby
+"" -- require'lspconfig'.terraformls.setup{} -- Terraform
+""  -- (disabled 2022-10-05 as crashes M1! https://github.com/hashicorp/terraform/issues/31467)
+""  -- (re-enabled 2022-11-11 after disabling IPv6 on M1 (System Preferences, Wi-Fi, Advanced, TCP/IP, IPv6 -> 'Link-local only'))
+""  -- disabled again 2022-12-09, slow as fuck
+"" local lsp = require "lspconfig"
+"" local coq = require "coq"
+"" -- third party LSPs for copilot + coq
+"" -- disabled 2022-12-08 as not working
+"" require("coq_3p") {
+""   { src = "copilot", short_name = "COP", accept_key = "<c-f>" },
+"" }
+"" EOF
 
-"" copilot remapping (default: <Tab>)
+"" coc.nvim
+""" use tab for trigger completion with characters ahead and navigate
+"" disabled coc.nvim for copilot 2024-10-17
+let g:coc_start_at_startup = 0
+"inoremap <silent><expr> <TAB>
+"      \ coc#pum#visible() ? coc#pum#next(1) :
+"      \ CheckBackspace() ? "\<Tab>" :
+"      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+"inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+"                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+" Use <c-space> to trigger completion
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+" GoTo code navigation
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+" 2024-08-30 not working, throws error
+" nmap <silent> gr <Plug>(coc-references)
+" Use K to show documentation in preview window
+nnoremap <silent> K :call ShowDocumentation()<CR>
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+" Highlight the symbol and its references when holding the cursor
+autocmd CursorHold * silent call CocActionAsync('highlight')
+" Symbol renaming
+nmap <leader>rn <Plug>(coc-rename)
+" Formatting selected code
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s)
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+" Applying code actions to the selected code block
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying refactor code actions
+nmap <silent> <leader>re <Plug>(coc-codeaction-refactor)
+xmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
+nmap <silent> <leader>r  <Plug>(coc-codeaction-refactor-selected)
+
+
+
+" "" copilot remapping (default: <Tab>)
 imap <silent><script><expr> <Leader><CR> copilot#Accept("\<CR>")
 "let g:copilot_no_tab_map = v:true
 imap <silent> <C-]> <Plug>(copilot-next)
@@ -120,8 +197,13 @@ EOF
 "" todo-comments.nvim
 lua << EOF
 require("todo-comments").setup({
-  highlight = {
-    pattern = [[.*<(KEYWORDS)(\(.*\))?\s*:]],
+   highlight = {
+    -- vimgrep regex, supporting the pattern TODO(name):
+    pattern = [[.*<((KEYWORDS)%(\(.{-1,}\))?):]],
+  },
+  search = {
+    -- ripgrep regex, supporting the pattern TODO(name):
+    pattern = [[\b(KEYWORDS)(\(\w*\))*:]],
   }
 })
 EOF
@@ -136,6 +218,24 @@ let g:vimwiki_listsyms = ' .ox'
 let g:vimwiki_listsym_rejected = '~'
 au BufNewFile ~/vault/diary/*.md :silent 0r !~/.vim/bin/generate-vimwiki-diary-template '%'
 
+"" octo.nvim
+lua << EOF
+require"octo".setup({
+  enable_builtin = true,
+  default_merge_method = 'squash',
+})
+-- additional keymaps in ~/.config/nvim/bin/after/ftplugin/octo.lua
+-- e.g. # and @ autocompletion in PRs
+EOF
+nnoremap <silent> <Leader>o :Octo<CR>
+
+"" netrw (icons)
+lua << EOF
+require("netrw").setup({
+  icons = {
+  }
+})
+EOF
 
 "" vimspector
 "let g:vimspector_base_dir=expand('$HOME/.vim/plugged/vimspector')
@@ -192,20 +292,22 @@ let g:workspace_session_disable_on_args = 1
 "" vim-fugitive
 nnoremap <silent> <Leader>g :G<CR>
 
-"" octo.nvim
-lua << EOF
-require('octo').setup()
-EOF
+"" vim-dadbod-ui
+nnoremap <silent> <Leader>db :DBUI<CR>
 
 "" FZF + Rg
 let g:fzf_vim = {}
 let g:fzf_vim.preview_window = ['right:40%']
 """ the 'delimiter' option with nth 3 is dependent on the '--no-column' flag
+""" if calling :Rg with no args, only search contents with no file search,
+"""   otherwise search contents with filename searchable in window
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
   \   "rg --column --line-number --no-column --no-heading --color=always --smart-case -- ".shellescape(<q-args>), 1,
-  \   fzf#vim#with_preview({'options': '--delimiter : --nth 3..'}), <bang>0)
-  "\   fzf#vim#with_preview('right:hidden', 'ctrl-/'), <bang>0)
+  \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 3..'})
+  \           : fzf#vim#with_preview('right:50:hidden', '?'),
+  \   <bang>0)
+
 nnoremap <silent> <Leader>p :FZF<CR>
 nnoremap <silent> <Leader>P :Project<CR>
 nnoremap <silent> <Leader>h :History<CR>
@@ -240,17 +342,16 @@ let g:tmux_navigator_disable_when_zoomed = 1
 
 "" goyo
 let g:goyo_width = '80%'
-let g:goyo_height = '90%'
+let g:goyo_height = '80%'
 autocmd! User GoyoEnter Limelight
 autocmd! User GoyoLeave Limelight!
 let g:limelight_conceal_guifg = '#434340'
 
-
 "" vim-test
-let test#strategy = "neovim"
+let g:test#strategy = 'floaterm'
 let g:test#neovim#start_normal = 0
+" let g:test#neovim#term_position = "horizontal bot 40"
 let g:test#echo_command = 0
-let test#neovim#term_position = "horizontal bot 40"
 nmap <silent> <leader>t :TestNearest<CR>
 nmap <silent> <leader>T :TestFile<CR>
 nmap <silent> <leader>l :TestLast<CR>
@@ -258,6 +359,7 @@ nmap <silent> <leader>l :TestLast<CR>
 nmap <silent> <leader>L :TestVisit<CR>
 let test#typescript#jest#executable = 'yarn jest'
 let test#javascript#jest#executable = 'yarn jest'
+let test#custom_runners = {'Rego': ['Conftest']}
 
 "" chatgpt.nvim
 lua << EOF
@@ -269,6 +371,8 @@ EOF
 nmap <silent> <leader>c :ChatGPT<CR>
 nmap <silent> <leader>ce :ChatGPTEditWithInstructions<CR>
 
+"" vim-floaterm
+let g:floaterm_keymap_toggle = '<Leader>u'
 
 "" begin custom
 set encoding=utf-8
@@ -278,6 +382,8 @@ set autoread
 set cindent
 set wrap
 set noswapfile
+set nobackup
+set nowritebackup
 """ stop fucking creating undodir in my local directory PLEASE
 if !isdirectory($HOME."/.vim")
     call mkdir($HOME."/.vim", "", 0770)
@@ -327,17 +433,18 @@ set signcolumn=auto:2 " show vimspector breakpoints + gitgutter signs
 "set noequalalways " don't resize splits when opening a new one
 " (disabled on 2023-08-16)
 "set clipboard=unnamed " yank to system clipboard
+set updatetime=300 " faster updates for coc.nvim
 
-"" file explorer
+"" file explorer (netrw)
 let g:netrw_liststyle = 3
-let g:netrw_banner = 0
 let g:netrw_winsize = 20
-let g:netrw_altv = 1
-let g:netrw_browse_split = 4
-let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro nornu"
+"let g:netrw_altv = 1
+"let g:netrw_browse_split = 4
+"let g:netrw_bufsettings="noma nomod nonu nobl nowrap ro nornu"
 
 "" find files recursively using :find
 set path=.,/usr/include,,**
+
 
 "" colours
 set termguicolors
@@ -352,6 +459,16 @@ require('kanagawa').setup({
 })
 EOF
 colorscheme kanagawa
+
+"" further avante setup
+autocmd! User avante.nvim
+lua << EOF
+require('avante_lib').load()
+require('avante').setup({
+  provider = 'copilot',
+})
+EOF
+
 
 "" syntax
 syntax on
@@ -426,25 +543,8 @@ function! StatuslineMode()
   endif
 endfunction
 
-function! StatuslineGitBranch()
-  let b:gitbranch=""
-  if &modifiable
-    lcd %:p:h
-    let l:gitrevparse=system("git rev-parse --abbrev-ref HEAD")
-    lcd -
-    if l:gitrevparse!~"fatal: not a git repository"
-      let b:gitbranch="(".substitute(l:gitrevparse, '\n', '', 'g').") "
-    endif
-  endif
-endfunction
-
 " auto :e to get file changes on focus change
 au FocusGained,BufEnter * :checktime
-
-augroup GetGitBranch
-  autocmd!
-  autocmd VimEnter,WinEnter,BufEnter * call StatuslineGitBranch()
-augroup END
 
 augroup CursorLineOnlyInActiveWindow
   autocmd!
@@ -538,7 +638,7 @@ command! BufOnly execute '%bdelete!|edit#|bdelete#|normal `"'
 xnoremap p pgvy
 
 "" quick format json file 2022-11-29
-nmap =j :%!python3 -m json.tool<CR>
+nmap <j :%!python3 -m json.tool<CR>
 
 "" syntax folding w auto open
 "" commands: za toggle open/close, zA toggle nested, zR open all, zM close all
@@ -559,10 +659,11 @@ autocmd TermOpen * setlocal nonumber norelativenumber
 set tags=./tags;$HOME
 
 "" indent file & return to location 2023-05-26
-nmap == gg=G''
+nmap <> gg=G''
 
-" fix whatever plugin keeps stealing my Esc key 2023-05-26
+" fix whatever plugin keeps stealing my Esc key 2023-05-26 (it's copilot)
 iunmap <Esc>
+
 
 " no background for vertical split bar
 hi VertSplit guibg=white
@@ -587,3 +688,11 @@ endfunction
 
 " better markdown viewing 2024-06-25
 autocmd FileType markdown,vimwiki setlocal nonumber norelativenumber syntax=markdown
+autocmd BufNewFile,BufRead ~/vault/* setlocal nonumber norelativenumber syntax=vimwiki
+
+" disable copilot for large files https://codeinthehole.com/tips/vim-and-github-copilot/ 2024-12-06
+ autocmd BufReadPre *
+     \ let f=getfsize(expand("<afile>"))
+     \ | if f > 100000 || f == -2
+     \ | let b:copilot_enabled = v:false
+     \ | endif

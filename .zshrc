@@ -197,7 +197,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 # make fzf ignore .git/node_modules files
 export FZF_DEFAULT_COMMAND='rg --files --follow --hidden -g "!{node_modules/*,.git/*}"'
 # make fzf remember last search
-export FZF_DEFAULT_OPTS="--history=$HOME/.fzf_history"
+export FZF_DEFAULT_OPTS="-m --history=$HOME/.fzf_history"
 
 # gopath default is $HOME/go 2022-11-04
 
