@@ -13,10 +13,10 @@ option.backup = false
 option.writebackup = false
 
 -- undo
-vim.fn.mkdir(vim.fn.expand("~/.vim/undodir"), "p")
-option.undodir = vim.fn.expand("~/.vim/undodir")
+local undodir = vim.fn.stdpath("state") .. "/undodir"
+vim.fn.mkdir(undodir, "p")
+option.undodir = undodir
 option.undofile = true
-option.backupdir = vim.fn.expand("~/.vim/backupdir/")
 
 option.number = true
 option.relativenumber = true
@@ -72,4 +72,4 @@ vim.g.netrw_liststyle = 3
 vim.g.netrw_winsize = 20
 
 -- spellfile
-option.spellfile = vim.fn.expand("~/.vim/spell/en.utf-8.add")
+option.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"

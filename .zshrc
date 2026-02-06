@@ -1,7 +1,5 @@
-# If you come from bash you might have to change your $PATH.
-# add go binaries to PATH 2022-03-16
-export PATH=$PATH:$(go env GOPATH)/bin
-export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/latest/latest/bin
+# f you come from bash you might have to change your $PATH.
+#export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/latest/latest/bin
 
 # https://github.com/ruimarinho/gsts#amazon-ecr 2022-04-07
 export PATH=$PATH:$HOME/.docker/bin
@@ -116,10 +114,32 @@ alias chrome="open -a /Applications/Google\ Chrome.app"
 alias fnd="find . -name"
 alias t="npm t"
 
-# taskwarrior aliases 2020-12-11
-alias in="task add +in"
-alias inbox="task in"
-alias next="task modify -in +next"
+# mkdir + cd in one command
+mkcd () {
+  \mkdir -p "$1"
+  cd "$1"
+}
+# change to temp dir
+tempe () {
+  cd "$(mktemp -d)"
+  chmod -R 0700 .
+  if [[ $# -eq 1 ]]; then
+    \mkdir -p "$1"
+    cd "$1"
+    chmod -R 0700 .
+  fi
+}
+# make a noise after a command has run
+boop () {
+  local last="$?"
+  if [[ "$last" == '0' ]]; then
+    sfx good
+  else
+    sfx bad
+  fi
+  $(exit "$last")
+}
+
 
 # fix gpg2 pinentry-curses 'inappropriate ioctl for device' error 2020-01-21
 export GPG_TTY=$(tty)
@@ -158,6 +178,7 @@ if [[ "$_ARCH" == "arm64" ]]; then
  alias brew="abrew"
  # export GEM_HOME=$HOME/.gem unset for rvm
  export PATH=$HOME/.gems/bin:$PATH
+ export PATH=$HOME/.gem/bin:$PATH
  export PATH="/opt/homebrew/bin:$PATH"
  export PATH="/opt/homebrew/opt:$PATH"
  export PATH="/opt/homebrew/opt/curl/bin:$PATH"
@@ -176,13 +197,14 @@ alias arm="$env /usr/bin/arch -arm64 /bin/zsh --login"
 alias intel="$env /usr/bin/arch -x86_64 /bin/zsh --login"
 
 # ruby 2022-03-28
-eval "$(rbenv init - zsh)"
+#eval "$(rbenv init - zsh)"
+#export RUBYOPT="-rdebug/open"
 
 # aws alias & region for awscli / gsts 2022-04-07
 # idp-id and sp-id need replacing with real values
 alias aws-login="gsts --idp-id ABCDEF --sp-id 1234 --force"
 export AWS_DEFAULT_REGION="eu-west-1"
-export AWS_PROFILE="saml"
+export AWS_PROFILE="default"
 function aws-ecr-login() {
   [[ -z $1 ]] && echo "requires account ID as arg 1" && return 1
   aws ecr get-login-password | docker login -u AWS --password-stdin "$1.dkr.ecr.eu-west-1.amazonaws.com"
@@ -193,16 +215,23 @@ alias mydocker="docker build -t mydocker . && docker run --cap-add='SYS_ADMIN' m
 
 # add RVM to PATH for scripting 2022-07-19
 export PATH="$PATH:$HOME/.rvm/bin"
+export PATH="$PATH:$GEM_HOME/bin"
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # make fzf ignore .git/node_modules files
 export FZF_DEFAULT_COMMAND='rg --files --follow --hidden -g "!{node_modules/*,.git/*}"'
 # make fzf remember last search
 export FZF_DEFAULT_OPTS="-m --history=$HOME/.fzf_history"
+# set up fzf
+source <(fzf --zsh)
 
 # gopath default is $HOME/go 2022-11-04
 
 # add custom scripts to path 2023-01-04
 export PATH="$PATH:$HOME/dev/dotfiles/scripts"
+# add yarn global packages to path 2025-09-25
+export PATH="$PATH:$(yarn global bin)"
 
 # ctags alias (brew instead of default mac) 2023-01-04
 alias ctags="`brew --prefix`/bin/ctags"
@@ -215,3 +244,14 @@ alias aws-login="saml2aws login"
 
 # fixes spring tests
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+alias openssl3="/opt/homebrew/bin/openssl"
+
+# rainfrog (DB management TUI) config dir location 2025-07-11
+export RAINFROG_CONFIG="$HOME/.config/rainfrog"
+
+# Created by `pipx` on 2025-11-07 12:46:46
+export PATH="$PATH:$HOME/.local/bin"
+
+# machine-specific secrets, work aliases, API tokens
+source ~/.zshrc.local 2>/dev/null

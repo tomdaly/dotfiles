@@ -1,0 +1,149 @@
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[[keyboard.bindings]]
+chars = "#"
+key = "Key3"
+mods = "Alt"
+
+[[keyboard.bindings]]
+action = "SpawnNewInstance"
+key = "N"
+mods = "Command"
+
+[[keyboard.bindings]]
+action = "None"
+key = "T"
+mods = "Command"
+
+[[keyboard.bindings]]
+action = "None"
+key = "W"
+mods = "Command"
+
+[general]
+live_config_reload = true
+import = [
+    "~/.config/alacritty/themes/kanagawa-wave.toml"
+]
+
+[[mouse.bindings]]
+action = "PasteSelection"
+mouse = "Middle"
+
+## colors managed by general.themes
+# [[colors.indexed_colors]]
+# color = "0xffa066"
+# index = 16
+#
+# [[colors.indexed_colors]]
+# color = "0xff5d62"
+# index = 17
+#
+# [colors.bright]
+# black = "0x727169"
+# blue = "0x7fb4ca"
+# cyan = "0x7aa89f"
+# green = "0x98bb6c"
+# magenta = "0x938aa9"
+# red = "0xe82424"
+# white = "0xdcd7ba"
+# yellow = "0xe6c384"
+#
+# [colors.normal]
+# black = "0x090618"
+# blue = "0x7e9cd8"
+# cyan = "0x6a9589"
+# green = "0x76946a"
+# magenta = "0x957fb8"
+# red = "0xc34043"
+# white = "0xc8c093"
+# yellow = "0xc0a36e"
+#
+# [colors.primary]
+# background = "0x141419"
+# foreground = "0xdcd7ba"
+#
+# [colors.selection]
+# background = "0x2d4f67"
+# foreground = "0xc8c093"
+
+[cursor]
+style = "Block"
+unfocused_hollow = true
+
+[debug]
+log_level = "Warn"
+persistent_logging = false
+print_events = false
+render_timer = false
+
+[font]
+size = 13.0
+
+[font.bold]
+family = "SauceCodePro Nerd Font Propo"
+style = "Bold"
+
+[font.glyph_offset]
+x = 0
+y = 0
+
+[font.italic]
+family = "SauceCodePro Nerd Font Propo"
+style = "Italic"
+
+[font.normal]
+family = "SauceCodePro Nerd Font Propo"
+style = "Regular"
+
+[font.offset]
+x = 0
+y = 0
+
+[[hints.enabled]]
+command = "open"
+post_processing = true
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)[^\u0000-\u001F\u007F-<>\"\\s{-}\\^⟨⟩`]+"
+
+[hints.enabled.binding]
+key = "U"
+mods = "Control|Shift"
+
+[hints.enabled.mouse]
+enabled = true
+mods = "Control"
+
+[mouse]
+hide_when_typing = true
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[selection]
+save_to_clipboard = false
+semantic_escape_chars = ''',│`|:"' ()[]{}<>'''
+
+[bell]
+animation = "EaseOutExpo"
+color = "0xffffff"
+duration = 0
+command = { program = "osascript", args = ["-e", "beep"] }
+
+[window]
+decorations = "buttonless"
+dynamic_padding = false
+startup_mode = "Windowed"
+dynamic_title = true
+opacity = 1.0
+
+[window.dimensions]
+columns = 120
+lines = 40
+
+[window.padding]
+x = 0
+y = 0
+
+[keyboard]

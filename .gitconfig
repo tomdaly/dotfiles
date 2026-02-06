@@ -1,10 +1,10 @@
 [user]
 	name = tomdaly
-	email = tomdaly@users.noreply.github.com
 [core]
 	editor = nvim
-	excludesFile = ~/.gitignore_global
+	excludesfile = ~/.gitignore_global
 	hooksPath = ~/.git_hooks_global
+	symlinks = true
 [gpg]
 	program = /opt/homebrew/bin/gpg
 [commit]
@@ -25,3 +25,9 @@
 	cmd = difft "$LOCAL" "$REMOTE"
 [pager]
 	difftool = true
+[credential]
+	helper = osxkeychain
+[tag]
+	gpgsign = true
+[include]
+	path = ~/.gitconfig.local

@@ -1,0 +1,4 @@
+.DS_Store
+.zshrc.local
+.gitconfig.local
+lazy-lock.json
