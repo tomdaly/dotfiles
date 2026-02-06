@@ -1,0 +1,13 @@
+- Extra context for LLMs may be stored in the `.llm/` directory of each project
+  - If `.llm/` exists, it will be at the root directory of the git repository
+  - The global gitignore `~/.gitignore_global` includes `/.llm`, so don't `git add` its contents
+- Editable context:
+  - A ticket will generally be specified out by Tom at `~/vault/projects/tickets/<ticketName>.md`
+  - This file will contain a `todo` header containing the list of tasks being worked on
+      - If this file does not exist while you work on a ticket, create it using the template at `~/vault/resources/templates/ticket-template.md`
+  - As you complete tasks, mark the checkboxes as complete, like `- [x] The task`
+  - If a task becomes irrelevant, mark it like `- [-] Irrelevant task`, do not delete it
+  - As we work on an implementation, plans will change. Feel free to edit the task list to keep it relevant and in sync with your plans.
+- Read-only context:
+  - Everything else in the `.llm/` directory is read-only context for the your reference
+  - It contains saved documentation

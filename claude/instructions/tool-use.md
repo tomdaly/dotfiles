@@ -1,0 +1,8 @@
+- I replaced `cd` with `zoxide` (`z`). Use `command cd` to change directories.
+  - This is the only command that needs to be prefixed with `command`.
+  - Don't prefix `git` with `command git`.
+- Try not to use `cd` or `zoxide` at all. It's usually not necessary with CLI commands.
+  - Don't run `cd <dir> && git <subcommand>`
+  - Prefer `git -C <dir> <subcommand`
+
+@tool-use.private.md

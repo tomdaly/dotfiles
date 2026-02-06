@@ -1,0 +1,31 @@
+- When creating a branch, use the format `<name>/<ticket>/<description>`
+    - Ticket name should be the JIRA ticket name (e.g. `proj-1234`)
+    - Exception: `noticket` for minor changes instead of ticket name
+    - The description should be a kebab-case task name based on the todo item (e.g., "auth-feature", "database-migration")
+- 📦 Stage individually using `git add <file1> <file2> ...`
+  - Only stage changes that you remember editing yourself.
+  - Avoid commands like `git add .` and `git add -A` and `git commit -am` which stage all changes
+- Use single quotes around file names containing `$` characters
+  - Example: `git add 'app/routes/_protected.foo.$bar.tsx'`
+- 🐛 If the user's prompt was a compiler or linter error, create a `fixup` commit message.
+- Otherwise:
+- Commit messages should:
+  - Use Conventional Commits style (e.g. prefix with `feat:`, `fix:`, `chore:`, `refactor:`)
+  - Start with a present-tense verb (fix, add, implement, etc.)
+  - Not include adjectives that sound like praise (comprehensive, best practices, essential)
+  - Be concise (60-120 characters)
+  - Be a single line
+      - Don't add a commit description
+  - Sound like the title of the issue we resolved, and not include the implementation details we learned during implementation
+  - Describe the intent of the original prompt
+- Commit messages should not include a Claude attribution footer
+  - Don't write: 🤖 Generated with [Claude Code](https://claude.ai/code)
+  - Don't write: Co-Authored-By: Claude <noreply@anthropic.com>
+- Echo exactly this: Ready to commit: `git commit --message "<message>"`
+- 🚀 Run git commit without confirming again with the user.
+- If pre-commit hooks fail, then there are now local changes
+  - `git add` those changes and try again
+  - Never use `git commit --no-verify`
+  - There is a pre-commit step to block committing 'TODO' lines in a commit patch
+      - If a TODO line found, and they were not created by you, remove the lines from the patch
+- You are not allowed to run `git push` -- I will do this after verifying changes

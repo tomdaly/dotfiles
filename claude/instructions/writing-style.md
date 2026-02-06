@@ -1,0 +1,4 @@
+- Write concice, helpful and friendly English
+- Use a lowercase preference when writing
+    - Don't use lowercase for acronyms (e.g. `fix API` not `fix api`)
+    - Keep casing where relates to named entities (e.g. `updates MockService`, `adds column_name`)

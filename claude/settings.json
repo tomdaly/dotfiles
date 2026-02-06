@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "BASH_MAX_TIMEOUT_MS": "1800000"
+  },
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "LS(*)",
+      "NotebookRead(*)",
+      "WebFetch",
+      "WebSearch",
+      "TodoWrite(*)",
+      "Edit(*)",
+      "MultiEdit(*)",
+      "Write(*)",
+      "NotebookEdit(*)",
+
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(pwd)",
+      "Bash(whoami)",
+      "Bash(which:*)",
+      "Bash(touch:*)",
+      "Bash(cp:*)",
+      "Bash(sed:*)",
+      "Bash(tee:*)",
+      "Bash(true)",
+      "Bash(test:*)",
+      "Bash(timeout:*)",
+      "Bash(printf:*)",
+      "Bash(wc:*)",
+      "Bash(date:*)",
+      "Bash(command cd:*)",
+      "Bash(/dev/null)",
+
+      "Bash(git add:*)",
+      "Bash(git status)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git fetch:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset --soft:*)",
+      "Bash(git stash:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git merge-base:*)",
+      "Bash(git remote:*)",
+
+      "Bash(node:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(yarn:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(nx prepush:*)",
+      "Bash(nx show projects:*)",
+      "Bash(nx run-many:*)",
+      "Bash(nx run:*)",
+      "Bash(nx affected:*)",
+      "Bash(nx lint:*)",
+      "Bash(nx test:*)",
+      "Bash(nx build:*)",
+      "Bash(nx documentation:*)",
+      "Bash(pnpm commit:*)",
+
+      "Bash(ruby:*)",
+      "Bash(rails:*)",
+      "Bash(bin/rspec:*)",
+      "Bash(bin/rails:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle exec rails:*)",
+      "Bash(bundle exec rake:*)",
+      "Bash(bundle exec rubocop:*)",
+      "Bash(spring stop:*)",
+      "Bash(rvm:*)",
+      "Bash(RAILS_ENV=development bundle exec rake db:migrate)",
+      "Bash(RAILS_ENV=test bundle exec rake db:migrate)",
+      "Bash(RAILS_ENV=test bundle exec rails runner:*)",
+
+      "Bash(make setup)",
+      "Bash(make lint)",
+      "Bash(make test)",
+
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr checkout:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh api:*)",
+
+      "Bash(aws pi:*)",
+      "Bash(aws sts get-caller-identity:*)",
+      "Bash(aws cloudwatch get-metric-statistics:*)",
+      "Bash(aws logs describe-log-streams:*)",
+
+      "Bash(open:*)",
+      "Bash(say:*)",
+      "Bash(sips:*)",
+      "Bash(magick:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(log stream:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(rmdir:*)",
+      "Bash(dd:*)",
+      "Bash(format:*)",
+      "Bash(mkfs:*)",
+      "Bash(fdisk:*)",
+      "Bash(chmod 000:*)",
+      "Bash(chmod 777:*)",
+      "Bash(chmod -R 777:*)",
+      "Bash(chown root:*)",
+      "Bash(> /dev/*)",
+
+      "Bash(sudo:*)",
+      "Bash(eval:*)",
+      "Bash(exec:*)",
+      "Bash(source:*)",
+      "Bash(base64 -d:*)",
+      "Bash(bash -c:*)",
+      "Bash(sh -c:*)",
+      "Bash(alias:*)",
+      "Bash(export PATH:*)",
+      "Bash(export LD_LIBRARY_PATH:*)",
+      "Bash(history:*)",
+      "Bash(unset HISTFILE)",
+
+      "Bash(git reset --hard HEAD~:*)",
+      "Bash(git push:*)",
+
+      "Bash(nc:*)",
+      "Bash(netcat:*)",
+      "Bash(telnet:*)",
+      "Bash(ssh:*)",
+      "Bash(iptables:*)",
+      "Bash(ufw:*)",
+
+      "Bash(crontab:*)",
+      "Bash(systemctl:*)",
+      "Bash(service:*)",
+      "Bash(mount:*)",
+      "Bash(umount:*)",
+      "Bash(selinux:*)",
+      "Bash(apparmor:*)",
+      "Bash(nohup:*)",
+      "Bash(screen:*)",
+      "Bash(tmux:*)",
+      "Bash(kill -9:*)",
+      "Bash(killall:*)",
+
+      "Bash(apt install:*)",
+      "Bash(apt-get install:*)",
+      "Bash(yum install:*)",
+      "Bash(brew install:*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)",
+      "Bash(npm install -g:*)",
+
+      "Bash(npm run dev)",
+      "Bash(npm run serve)",
+      "Bash(npm run start)",
+      "Bash(npm start)",
+      "Bash(yarn dev)",
+      "Bash(yarn serve)",
+      "Bash(yarn start)",
+      "Bash(rails server)",
+      "Bash(rails s)",
+      "Bash(bundle exec rails server)",
+      "Bash(bundle exec rails s)",
+      "Bash(python -m http.server :*)",
+      "Bash(php -S :*)",
+      "Bash(jekyll serve)",
+      "Bash(hugo server)",
+      "Bash(ng serve)",
+      "Bash(nx serve :*)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "curl -s -d \"Claude needs your attention\" ntfy.sh/${NTFY_TOPIC}"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "curl -s -d \"Claude has finished responding\" ntfy.sh/${NTFY_TOPIC}"
+          }
+        ]
+      }
+    ]
+  },
+  "enableAllProjectMcpServers": true
+}

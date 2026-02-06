@@ -15,6 +15,20 @@ link() {
   fi
 }
 
+linkdir() {
+  src="$DOTFILES/$1"
+  dest="$HOME/$2"
+  mkdir -p "$dest"
+  for f in "$src"/*; do
+    fname="$(basename "$f")"
+    if [ -e "$dest/$fname" ] || [ -L "$dest/$fname" ]; then
+      echo "skip (exists): $2/$fname"
+    else
+      ln -sv "$f" "$dest/$fname"
+    fi
+  done
+}
+
 # shell
 link .zshrc
 link .inputrc
@@ -41,4 +55,22 @@ link .ctags
 link .rgignore
 link .hammerspoon/init.lua
 
+# claude code
+link claude/settings.json .claude/settings.json
+link claude/CLAUDE.md .claude/CLAUDE.md
+linkdir claude/instructions .claude/instructions
+linkdir claude/commands .claude/commands
+linkdir claude/shared .claude/shared
+for skill_dir in "$DOTFILES"/claude/skills/*/; do
+  skill="$(basename "$skill_dir")"
+  mkdir -p "$HOME/.claude/skills/$skill"
+  if [ -e "$HOME/.claude/skills/$skill/SKILL.md" ] || [ -L "$HOME/.claude/skills/$skill/SKILL.md" ]; then
+    echo "skip (exists): .claude/skills/$skill/SKILL.md"
+  else
+    ln -sv "$skill_dir/SKILL.md" "$HOME/.claude/skills/$skill/SKILL.md"
+  fi
+done
+
 echo "done. remember to create ~/.zshrc.local and ~/.gitconfig.local"
+echo "      also create ~/.claude/instructions/me.private.md and tool-use.private.md"
+echo "      (see *.private.example.md for templates)"

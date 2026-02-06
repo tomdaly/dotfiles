@@ -1,0 +1,8 @@
+- Role: <your role>
+- Company: <your company>
+- Email: <your email>
+- Team: '<team name>'
+    - Teammates & GitHub username mapping:
+      - Name → github-username
+    - JIRA board: https://<instance>.atlassian.net/jira/software/c/projects/<PROJECT>/boards/<id>
+        - Ticket prefix: `<PREFIX>`
